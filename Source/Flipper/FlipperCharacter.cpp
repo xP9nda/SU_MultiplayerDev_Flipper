@@ -118,3 +118,35 @@ void AFlipperCharacter::DoJumpEnd()
 	// pass StopJumping to the character
 	StopJumping();
 }
+
+
+
+static FString RoleToString(ENetRole Role)
+{
+	switch (Role)
+	{
+	case ROLE_Authority:       return TEXT("Authority");
+	case ROLE_AutonomousProxy: return TEXT("AutonomousProxy");
+	case ROLE_SimulatedProxy:  return TEXT("SimulatedProxy");
+	default:                 return TEXT("None");
+	}
+}
+
+void AFlipperCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (!GEngine) return;
+	
+	const uint64 Key = (uint64)GetUniqueID();
+	const FString Line = FString::Printf(
+		TEXT("%s | Local: %s | Remote: %s | HasAuthority: %s"),
+		*GetName(), *RoleToString(GetLocalRole()), *RoleToString(GetRemoteRole()),
+		HasAuthority() ? TEXT("true") : TEXT("false"));
+
+	FColor Colour = FColor::Yellow;
+	if (GetLocalRole() == ROLE_Authority)            Colour = FColor::Green;
+	else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
+
+	GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
+}
