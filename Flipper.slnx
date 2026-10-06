@@ -13,14 +13,14 @@
     <Platform Name="Win64-arm64ec" />
   </Configurations>
   <Folder Name="/Engine/">
-    <Project Path="Intermediate/ProjectFiles/UE5.vcxproj" Id="29f04f0b-3ced-3fa3-85fe-ef54803ea192">
+    <Project Path="Intermediate/ProjectFiles/UE5.vcxproj" Id="7ed5c947-f33e-3bc6-a80e-c73e1e15b565">
       <BuildType Project="BuiltWithUnrealBuildTool" />
       <Platform Project="Win64" />
       <Build Project="false" />
     </Project>
   </Folder>
   <Folder Name="/Games/">
-    <Project Path="Intermediate/ProjectFiles/Flipper.vcxproj" Id="67c0cb63-ac6c-3e02-9260-bc806f1289be">
+    <Project Path="Intermediate/ProjectFiles/Flipper.vcxproj" Id="5f74890c-f6b2-3139-b3c5-5cbf388300cd">
       <BuildType Solution="DebugGame Editor|Android" Project="Invalid" />
       <BuildType Solution="DebugGame Editor|Android-arm64" Project="Invalid" />
       <BuildType Solution="DebugGame Editor|Android-x64" Project="Invalid" />
