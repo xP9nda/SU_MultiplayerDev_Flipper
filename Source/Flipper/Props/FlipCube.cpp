@@ -3,7 +3,6 @@
 
 #include "FlipCube.h"
 
-
 // Sets default values
 AFlipCube::AFlipCube()
 {
@@ -14,7 +13,6 @@ AFlipCube::AFlipCube()
 	SetReplicateMovement(true);
 	
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	
 	SetRootComponent(MeshComponent);
 }
 
@@ -24,6 +22,9 @@ void AFlipCube::BeginPlay()
 	Super::BeginPlay();
 	MeshComponent->SetStaticMesh(Mesh);
 	
+	if (DynamicMaterial) return;
+	DynamicMaterial = UMaterialInstanceDynamic::Create(CubeMaterial, this);
+	MeshComponent->SetMaterial(0, DynamicMaterial);
 }
 
 // Called every frame
@@ -35,5 +36,37 @@ void AFlipCube::Tick(float DeltaTime)
 	if (!HasAuthority()) return;
 	
 	AddActorLocalRotation(FRotator(0.0f, RotationSpeed * DeltaTime, 0.0f));
+	
+	TimeSinceLastColour += DeltaTime;
+	if (TimeSinceLastColour > TimeBetweenColourChanges)
+	{
+		// authoritative at this point
+		if (Colours.Num() == 0) return;
+		
+		MaterialColour = Colours[FMath::RandRange(0, Colours.Num() - 1)];
+		OnRep_MaterialColour();
+		
+		TimeSinceLastColour = 0.0f;
+	}
 }
+
+
+void AFlipCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AFlipCube, MaterialColour);
+}
+
+
+void AFlipCube::OnRep_MaterialColour()
+{
+	if (!DynamicMaterial)
+	{
+		DynamicMaterial = UMaterialInstanceDynamic::Create(CubeMaterial, this);
+		MeshComponent->SetMaterial(0, DynamicMaterial);
+	}
+	
+	DynamicMaterial->SetVectorParameterValue("Colour", MaterialColour);
+}
+
 

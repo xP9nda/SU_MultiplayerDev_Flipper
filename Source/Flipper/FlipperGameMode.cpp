@@ -17,4 +17,10 @@ void AFlipperGameMode::BeginPlay()
 	GetWorld()->SpawnActor<AFlipCube>(
 		CubePropClass, FVector(0.0f, 0.0f, 200.0f), FRotator::ZeroRotator
 	);
+	GetWorld()->SpawnActor<AFlipCube>(
+		CubePropClass, FVector(0.0f, 0.0f, 300.0f), FRotator::ZeroRotator
+	);
+	GetWorld()->SpawnActor<AFlipCube>(
+		CubePropClass, FVector(0.0f, 0.0f, 400.0f), FRotator::ZeroRotator
+	);
 }

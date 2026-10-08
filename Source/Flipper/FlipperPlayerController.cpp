@@ -19,7 +19,6 @@ AFlipperPlayerController::AFlipperPlayerController()
 void AFlipperPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	// only spawn touch controls on local player controllers
 	if (IsLocalPlayerController() && ShouldUseTouchControls())

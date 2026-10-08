@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 #include "FlipCube.generated.h"
 
 UCLASS()
@@ -32,5 +33,29 @@ private:
 	TObjectPtr<UStaticMesh> Mesh;
 	
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> CubeMaterial;
+	
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterial;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FLinearColor> Colours;
+	
+	float TimeSinceLastColour = 0.0f;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_MaterialColour)
+	FLinearColor MaterialColour = FLinearColor::Black;
+	
+	UFUNCTION()
+	void OnRep_MaterialColour();
+	
+	UPROPERTY(EditAnywhere)
+	float TimeBetweenColourChanges = 5.0f;
+	
+	
+	UPROPERTY(EditAnywhere)
 	float RotationSpeed = 45.0f;
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
