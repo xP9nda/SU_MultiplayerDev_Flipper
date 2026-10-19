@@ -21,7 +21,7 @@ public class Flipper : ModuleRules
 			"Slate"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "GoogleTest" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "GoogleTest", "AITestSuite", "AITestSuite" });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"Flipper",

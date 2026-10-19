@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "FlipperCharacter.generated.h"
 
+class UFlipperInteractComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -30,6 +31,10 @@ class AFlipperCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+	
+	// Interaction - todo document 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UFlipperInteractComponent> InteractionComponent;
 
 protected:
 
@@ -48,6 +53,10 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
+	
+	// Interaction - todo document
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* InteractAction;
 	
 public:
 	AFlipperCharacter();
@@ -92,5 +101,9 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	
+private:
+	UFUNCTION(BlueprintCallable, Category="Interaction") //  - todo document
+	virtual void DoInteraction();
 };
 

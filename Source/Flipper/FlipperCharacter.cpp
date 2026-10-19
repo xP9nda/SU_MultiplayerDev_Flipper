@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Flipper.h"
+#include "Interactables/Components/FlipperInteractComponent.h"
 
 AFlipperCharacter::AFlipperCharacter()
 {
@@ -42,6 +43,15 @@ AFlipperCharacter::AFlipperCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+	
+	// Interaction  - todo document
+	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
+	InteractionComponent->SetIsReplicated(true);
+	FirstPersonCameraComponent->SetIsReplicated(true); // replicate camera so that the look at rotation is replicated therefore interaction can happen on the server through the clients eyes looking ahead
+	
+	FFlipperInteractComponentParams InteractionComponentParams;
+	InteractionComponentParams.CameraComponent = FirstPersonCameraComponent;
+	InteractionComponent->SetParams(InteractionComponentParams);
 }
 
 void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -59,6 +69,10 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFlipperCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AFlipperCharacter::LookInput);
+		
+		// Interaction - todo document
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, InteractionComponent.Get(), &UFlipperInteractComponent::AttemptInteract);
+
 	}
 	else
 	{
@@ -149,4 +163,13 @@ void AFlipperCharacter::Tick(float DeltaTime)
 	else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
 
 	GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
+}
+
+
+// -------- Client
+
+void AFlipperCharacter::DoInteraction()
+{
+	// perform a client interaction
+	InteractionComponent->AttemptInteract();
 }
