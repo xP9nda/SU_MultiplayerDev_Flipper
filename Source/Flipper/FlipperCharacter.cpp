@@ -47,11 +47,6 @@ AFlipperCharacter::AFlipperCharacter()
 	// Interaction  - todo document
 	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
 	InteractionComponent->SetIsReplicated(true);
-	FirstPersonCameraComponent->SetIsReplicated(true); // replicate camera so that the look at rotation is replicated therefore interaction can happen on the server through the clients eyes looking ahead
-	
-	FFlipperInteractComponentParams InteractionComponentParams;
-	InteractionComponentParams.CameraComponent = FirstPersonCameraComponent;
-	InteractionComponent->SetParams(InteractionComponentParams);
 }
 
 void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

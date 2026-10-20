@@ -9,17 +9,6 @@
 
 class UCameraComponent;
 
-USTRUCT()
-struct FFlipperInteractComponentParams
-{
-	GENERATED_BODY()
-	
-	UPROPERTY()
-	UCameraComponent* CameraComponent;	
-	
-};
-
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIPPER_API UFlipperInteractComponent : public UActorComponent
 {
@@ -40,12 +29,6 @@ public:
 	
 	UFUNCTION()
 	void AttemptInteract();
-	
-	UFUNCTION() // todo - document this
-	void SetParams(FFlipperInteractComponentParams Params)
-	{
-		OwnerCameraComponent = Params.CameraComponent;
-	};
 	
 	UPROPERTY(EditInstanceOnly)
 	float InteractionDistance = 500.0f;
