@@ -46,7 +46,6 @@ AFlipperCharacter::AFlipperCharacter()
 	
 	// Interaction  - todo document
 	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
-	InteractionComponent->SetIsReplicated(true);
 }
 
 void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
