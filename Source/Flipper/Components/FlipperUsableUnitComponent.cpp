@@ -87,8 +87,7 @@ void UFlipperUsableUnitComponent::SetCurrentFinish(const FGameplayTag NewCurrent
 	OnRep_CurrentFinish();
 }
 
-UFlipperUsableUnitComponent* UFlipperUsableUnitComponent::FindUnitComponentOfType(const AActor* Actor,
-                                                                                  const FGameplayTag& InTag)
+UFlipperUsableUnitComponent* UFlipperUsableUnitComponent::FindUnitComponentOfType(const AActor* Actor, const FGameplayTag& InTag)
 {
 	if (!Actor) return nullptr;
 
