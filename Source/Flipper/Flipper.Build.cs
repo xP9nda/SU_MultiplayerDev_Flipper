@@ -18,7 +18,8 @@ public class Flipper : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"GameplayTags"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "GoogleTest", "AITestSuite", "AITestSuite" });

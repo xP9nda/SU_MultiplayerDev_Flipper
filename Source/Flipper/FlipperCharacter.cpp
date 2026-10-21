@@ -9,7 +9,8 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Flipper.h"
-#include "Interactables/Components/FlipperInteractComponent.h"
+#include "Components/FlipperInteractComponent.h"
+#include "Components/FlipperUsableUnitComponent.h"
 
 AFlipperCharacter::AFlipperCharacter()
 {
@@ -46,6 +47,12 @@ AFlipperCharacter::AFlipperCharacter()
 	
 	// Interaction  - todo document
 	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
+	
+	// Usable Units
+	// - Paint
+	PaintComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("PaintComponent"));
+	// - Wallpaper
+	WallpaperComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("WallpaperComponent")); 
 }
 
 void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -66,7 +73,6 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		
 		// Interaction - todo document
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, InteractionComponent.Get(), &UFlipperInteractComponent::AttemptInteract);
-
 	}
 	else
 	{
@@ -157,13 +163,4 @@ void AFlipperCharacter::Tick(float DeltaTime)
 	else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
 
 	GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
-}
-
-
-// -------- Client
-
-void AFlipperCharacter::DoInteraction()
-{
-	// perform a client interaction
-	InteractionComponent->AttemptInteract();
 }

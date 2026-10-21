@@ -24,7 +24,7 @@ void AFlipperBaseInteractable::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AFlipperBaseInteractable::Interact_Implementation()
+void AFlipperBaseInteractable::Interact_Implementation(AActor* Interactor)
 {
 	UE_LOG(LogTemp, Log, TEXT("Base interactable method fired."));
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/FlipperUsableUnitComponent.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "FlipperCharacter.generated.h"
@@ -35,6 +36,13 @@ class AFlipperCharacter : public ACharacter
 	// Interaction - todo document 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UFlipperInteractComponent> InteractionComponent;
+	
+	// Usable Units
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UFlipperUsableUnitComponent> PaintComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UFlipperUsableUnitComponent> WallpaperComponent;
 
 protected:
 
@@ -100,10 +108,6 @@ public:
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
 	
-private:
-	UFUNCTION(BlueprintCallable, Category="Interaction") //  - todo document
-	virtual void DoInteraction();
 };
 

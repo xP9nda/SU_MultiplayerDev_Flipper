@@ -6,7 +6,6 @@
 #include "Components/StateTreeAIComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Navigation/PathFollowingComponent.h"
-#include "AI/Navigation/PathFollowingAgentInterface.h"
 
 AShooterAIController::AShooterAIController()
 {

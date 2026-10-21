@@ -1,0 +1,24 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "FlipperHUD.h"
+
+#include "Blueprint/UserWidget.h"
+
+void AFlipperHUD::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	APlayerController* OwningController = GetOwningPlayerController();
+	if (!OwningController) return;
+	
+	if (!HUDWidgetClass) return;
+	
+	HUDWidget = CreateWidget<UUserWidget>(OwningController, HUDWidgetClass);
+	if (!HUDWidget) return;
+	
+	HUDWidget->AddToViewport();
+	
+	OwningController->SetInputMode(FInputModeGameOnly());
+	OwningController->bShowMouseCursor = false;
+}

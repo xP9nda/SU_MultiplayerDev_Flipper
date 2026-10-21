@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FlipperInteract.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/FlipperInteract.h"
 #include "FlipperBaseInteractable.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class FLIPPER_API AFlipperBaseInteractable : public AActor, public IFlipperInteract //  - todo document
 {
 	GENERATED_BODY()
@@ -25,5 +25,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(Blueprintable)
-	virtual void Interact_Implementation() override;
+	virtual void Interact_Implementation(AActor* Interactor) override;
 };

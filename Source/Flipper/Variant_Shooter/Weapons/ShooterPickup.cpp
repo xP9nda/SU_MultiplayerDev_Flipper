@@ -6,7 +6,6 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "ShooterWeaponHolder.h"
-#include "ShooterWeapon.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
