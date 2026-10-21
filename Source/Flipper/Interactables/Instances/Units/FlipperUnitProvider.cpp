@@ -43,7 +43,7 @@ void AFlipperUnitProvider::SetupMaterial()
 			{
 				// update the colour and texture with whatever surface finish is given out by this unit provider
 				FillMaterialDynamic->SetVectorParameterValue(MaterialProvidedColourParameterName, ProvidedSurfaceFinish->SurfaceColour);
-				FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->SurfaceTexture);
+				FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->StartingSurfaceTexture);
 			}
 		}
 	}

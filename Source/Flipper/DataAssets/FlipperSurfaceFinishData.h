@@ -23,15 +23,14 @@ struct FLIPPER_API FFlipperSurfaceFinish
 	FLinearColor SurfaceColour = FLinearColor::White;
 	
 	// The texture applied to the surface for the material
+	// This is only applied to the start texture for a paintable mesh. Target texture remains as whatever the starting surface texture of the starting finish is
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> SurfaceTexture;
+	TObjectPtr<UTexture2D> StartingSurfaceTexture;
 	
-	// Whether the SurfaceTexture is applied as the target texture as well as the starting texture.
-	//
-	// For instance, something like wallpaper would want to adopt its end texture, but something like paint wouldn't change the underlying texture of the paintable
-	// This only applies if this finish is used as a starting finish on a paintable
+	// The texture lerped towards as the target
+	// This should be left null on most finishes, and is only to be used when the target texture may differ from the starting finish's texture
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool SurfaceTextureAppliedAsTarget = true;
+	TObjectPtr<UTexture2D> FinishedSurfaceTexture;
 };
 
 

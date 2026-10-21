@@ -57,17 +57,7 @@ void AFlipperPaintableMesh::BeginPlay()
 			{
 				// update the start colour and texture with whatever surface finish is set to be the current one
 				DesiredMaterialDynamic->SetVectorParameterValue(MaterialStartColourParameterName, StartSurfaceFinish->SurfaceColour);
-				DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartSurfaceFinish->SurfaceTexture);
-				
-				// @note addition in favour of walls adopting their starting finish texture all the way through
-				// such that walls never change texture while being painted
-				// for instance, painting green paint onto a brick texture should not override a brick texture with a plaster one
-				// 
-				// if the surface texture won't be applied to target, then also set the target as the starting finish's surface texture
-				if (!StartSurfaceFinish->SurfaceTextureAppliedAsTarget)
-				{
-					DesiredMaterialDynamic->SetTextureParameterValue(MaterialTargetTextureParameterName, StartSurfaceFinish->SurfaceTexture);
-				}
+				DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartSurfaceFinish->StartingSurfaceTexture);
 			}
 		}
 	}
@@ -90,14 +80,14 @@ void AFlipperPaintableMesh::OnRep_PaintState()
 		const FFlipperSurfaceFinish* TargetSurfaceFinish = GameInstance->SurfaceData->GetFinish(CurrentFinish);
 		if (TargetSurfaceFinish)
 		{
-			// update the target colour and texture with whatever surface finish the player has 'equipped'
+			// update the target colour with whatever surface finish the player has 'equipped'
 			DesiredMaterialDynamic->SetVectorParameterValue(MaterialTargetColourParameterName, TargetSurfaceFinish->SurfaceColour);
 			
-			// @note redaction in favour of walls adopting their starting finish texture
-			// only apply the surface texture to the target parameter if the paintable mesh should adopt the target finish's texture after painting
-			if (TargetSurfaceFinish->SurfaceTextureAppliedAsTarget)
+			// if the target surface finish has a target texture, then set the target texture to be the final result
+			if (TargetSurfaceFinish->FinishedSurfaceTexture)
 			{
-				DesiredMaterialDynamic->SetTextureParameterValue(MaterialTargetTextureParameterName, TargetSurfaceFinish->SurfaceTexture); 
+				DesiredMaterialDynamic->SetTextureParameterValue(MaterialTargetTextureParameterName, TargetSurfaceFinish->FinishedSurfaceTexture);
+				DesiredMaterialDynamic->SetScalarParameterValue(MaterialUseTargetTextureParameterName, 1.0f); // scalar as a boolean. set to 1.0f to use the target texture. one is provided here, so we use it
 			}
 		}
 	}

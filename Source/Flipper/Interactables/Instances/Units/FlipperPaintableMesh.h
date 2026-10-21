@@ -40,6 +40,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialTargetTextureParameterName = FName("TargetTexture");
 	
+	// scalar as a boolean. set to 1.0f to use the target texture
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
+	FName MaterialUseTargetTextureParameterName = FName("UseTargetTexture");
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialStartColourParameterName = FName("StartColour");
 	
