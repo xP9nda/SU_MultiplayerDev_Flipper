@@ -36,8 +36,11 @@ void AFlipperPlayerController::BeginPlay()
 			UE_LOG(LogFlipper, Error, TEXT("Could not spawn mobile controls widget."));
 
 		}
-
 	}
+	
+	// set input modes
+	SetInputMode(FInputModeGameOnly());
+	bShowMouseCursor = false;
 }
 
 void AFlipperPlayerController::SetupInputComponent()

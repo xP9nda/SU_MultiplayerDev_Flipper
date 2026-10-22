@@ -18,7 +18,8 @@ class FLIPPER_API AFlipperHUD : public AHUD
 
 protected:
 	virtual void BeginPlay() override;
-	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|HUD")
 	TSubclassOf<UUserWidget> HUDWidgetClass; 
 	

@@ -12,13 +12,23 @@ void AFlipperHUD::BeginPlay()
 	APlayerController* OwningController = GetOwningPlayerController();
 	if (!OwningController) return;
 	
-	if (!HUDWidgetClass) return;
+	if (!HUDWidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FlipperHUD: HudWidgetClass is invalid"));
+		return;
+	}
 	
 	HUDWidget = CreateWidget<UUserWidget>(OwningController, HUDWidgetClass);
 	if (!HUDWidget) return;
 	
 	HUDWidget->AddToViewport();
+}
+
+void AFlipperHUD::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 	
-	OwningController->SetInputMode(FInputModeGameOnly());
-	OwningController->bShowMouseCursor = false;
+	if (!HUDWidget) return;
+	
+	HUDWidget->RemoveFromParent();
 }

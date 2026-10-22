@@ -44,22 +44,26 @@ void AFlipperPaintableMesh::BeginPlay()
 	// don't continue if no dynamic material at this point
 	if (!DesiredMaterialDynamic) return;
 	
+	if (!StartFinish.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartFinish is null on: %s"), *this->GetName());
+		return;
+	}
+	
 	// ensure default material parameters are applied
 	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
 	if (GameInstance && GameInstance->SurfaceData)
 	{
-		// only continue if the start finish is valid
-		if (StartFinish != FGameplayTag::EmptyTag)
+		// start finish is valid at this point
+		// get the starting surface finish from the game instance data asset and ensure the material is set up with that information
+		const FFlipperSurfaceFinish* StartSurfaceFinish = GameInstance->SurfaceData->GetFinish(StartFinish);
+		if (StartSurfaceFinish)
 		{
-			// get the starting surface finish from the game instance data asset and ensure the material is set up with that information
-			const FFlipperSurfaceFinish* StartSurfaceFinish = GameInstance->SurfaceData->GetFinish(StartFinish);
-			if (StartSurfaceFinish)
-			{
-				// update the start colour and texture with whatever surface finish is set to be the current one
-				DesiredMaterialDynamic->SetVectorParameterValue(MaterialStartColourParameterName, StartSurfaceFinish->SurfaceColour);
-				DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartSurfaceFinish->StartingSurfaceTexture);
-			}
+			// update the start colour and texture with whatever surface finish is set to be the current one
+			DesiredMaterialDynamic->SetVectorParameterValue(MaterialStartColourParameterName, StartSurfaceFinish->SurfaceColour);
+			DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartSurfaceFinish->StartingSurfaceTexture);
 		}
+	
 	}
 	
 	// ensure a late joiner receives an update visual of the paintable mesh

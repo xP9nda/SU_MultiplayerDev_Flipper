@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/FlipperUsableUnitComponent.h"
 #include "FlipperUnitsWidget.generated.h"
 
+class UFlipperUsableUnitComponent;
 class UProgressBar;
 class UImage;
 class UTextBlock;
@@ -22,9 +22,10 @@ class FLIPPER_API UFlipperUnitsWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
-	
+	virtual void NativeDestruct() override;
+
 	UFUNCTION()
-	void HandlePossessedPawnChanged(APawn* NewPawn, APawn* OldPawn);
+	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipper|Units", meta = (Categories = "Units"))
 	FGameplayTag UnitType;
@@ -35,22 +36,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipper|UI")
 	TObjectPtr<UTexture2D> UnitIconTexture;
 	
-	UPROPERTY(meta = (BindWidget="UnitIcon"))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> UnitIcon;
 	
-	UPROPERTY(meta = (BindWidget="MaxUnitsAvailableText"))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> MaxUnitsAvailableText;
 	
-	UPROPERTY(meta = (BindWidget="CurrentUnitsAvailableText"))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> CurrentUnitsAvailableText;
 	
-	UPROPERTY(meta = (BindWidget="CurrentFinishDisplayNameText"))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> CurrentFinishDisplayNameText;
 	
-	UPROPERTY(meta = (BindWidget="UnitsProgressBar"))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> UnitsProgressBar;
 	
 private:
+	void ObserveComponent(UFlipperUsableUnitComponent* NewComponent);
 	void UpdateVisibility();
 	
 	UFUNCTION()

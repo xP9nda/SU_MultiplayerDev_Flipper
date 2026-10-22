@@ -43,7 +43,8 @@ class FLIPPER_API UFlipperSurfaceFinishData : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	FFlipperSurfaceFinish* GetFinish(const FGameplayTag& Tag) { return Finishes.Find(Tag); } 
+	// const so that the returned finish cannot be written into, read-only
+	const FFlipperSurfaceFinish* GetFinish(const FGameplayTag& Tag) const { return Finishes.Find(Tag); } 
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Surfaces", meta = (Categories = "Finish"))
 	TMap<FGameplayTag, FFlipperSurfaceFinish> Finishes;

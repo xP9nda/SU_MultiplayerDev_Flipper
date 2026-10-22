@@ -11,7 +11,7 @@ UFlipperUsableUnitComponent::UFlipperUsableUnitComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
 	
 	// ...
@@ -82,6 +82,7 @@ void UFlipperUsableUnitComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
 void UFlipperUsableUnitComponent::SetCurrentFinish(const FGameplayTag NewCurrentFinish)
 {
 	if (!GetOwner()->HasAuthority()) return;
+	if (NewCurrentFinish == CurrentFinish) return; // don't update the finish if it's already this
 	
 	CurrentFinish = NewCurrentFinish;
 	OnRep_CurrentFinish();
@@ -89,7 +90,7 @@ void UFlipperUsableUnitComponent::SetCurrentFinish(const FGameplayTag NewCurrent
 
 UFlipperUsableUnitComponent* UFlipperUsableUnitComponent::FindUnitComponentOfType(const AActor* Actor, const FGameplayTag& InTag)
 {
-	if (!Actor) return nullptr;
+	if (!IsValid(Actor) || !InTag.IsValid()) return nullptr;
 
 	// store the actor components that are of type UFlipperUsableUnitComponent
 	TInlineComponentArray<UFlipperUsableUnitComponent*> ActorComponents;

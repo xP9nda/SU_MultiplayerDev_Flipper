@@ -24,7 +24,7 @@ void AFlipperUnitProvider::SetupMaterial()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DesiredMaterial is null on: %s"), *this->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("FillMaterial is null on: %s"), *this->GetName());
 	}
 	
 	if (FillStaticMeshComponent && FillMaterialDynamic)
@@ -63,6 +63,9 @@ void AFlipperUnitProvider::BeginPlay()
 	{
 		RemainingUnits = MaxUnitsAvailable;
 	}
+	
+	// ensure late joiners see the current state of the unit provider right away
+	OnRep_RemainingUnits();
 }
 
 void AFlipperUnitProvider::OnRep_RemainingUnits()
