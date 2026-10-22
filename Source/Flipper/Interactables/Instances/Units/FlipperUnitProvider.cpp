@@ -35,7 +35,7 @@ void AFlipperUnitProvider::SetupMaterial()
 		const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
 		if (GameInstance && GameInstance->SurfaceData)
 		{
-			if (ProvidedFinish == FGameplayTag::EmptyTag) return; // cancel if there's no provided finish set
+			if (!ProvidedFinish.IsValid()) return; // cancel if there's no provided finish set
 			
 			// get the starting provided finish from the game instance data asset and ensure the material is set up with that information
 			const FFlipperSurfaceFinish* ProvidedSurfaceFinish = GameInstance->SurfaceData->GetFinish(ProvidedFinish);
@@ -43,7 +43,17 @@ void AFlipperUnitProvider::SetupMaterial()
 			{
 				// update the colour and texture with whatever surface finish is given out by this unit provider
 				FillMaterialDynamic->SetVectorParameterValue(MaterialProvidedColourParameterName, ProvidedSurfaceFinish->SurfaceColour);
-				FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->StartingSurfaceTexture);
+				
+				if (ProvidedSurfaceFinish->FinishedSurfaceTexture)
+				{
+					// have the unit provider adopt the look of the target texture, i.e. how the paintable mesh will look once it has been painted
+					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->FinishedSurfaceTexture);
+				}
+				else
+				{
+					// if there's no target texture, then show the starting texture on the unit provider
+					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->StartingSurfaceTexture);
+				}
 			}
 		}
 	}
