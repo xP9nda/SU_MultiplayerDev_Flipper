@@ -7,6 +7,8 @@
 #include "Interfaces/FlipperInteract.h"
 #include "FlipperBaseInteractable.generated.h"
 
+class UFlipperOutlineComponent;
+
 UCLASS(Abstract)
 class FLIPPER_API AFlipperBaseInteractable : public AActor, public IFlipperInteract //  - todo document
 {
@@ -19,6 +21,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	TWeakObjectPtr<UFlipperOutlineComponent> OutlineComponent;
 
 public:
 	// Called every frame

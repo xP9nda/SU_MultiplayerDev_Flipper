@@ -35,8 +35,15 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Interaction")
 	float InteractionCooldown = 0.9f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Interaction")
+	float LookingAtActorTimerDelay = 0.05f;
 
 private:
+	FTimerHandle LookingAtActorTimerHandle;
+	TWeakObjectPtr<AActor> PreviouslyLookedAtActor;
+	void LookingAtActorTimerHandler();
+	
 	FHitResult PerformLinetrace();
 
 	UFUNCTION(Server, Reliable, WithValidation, Category="Interaction") // - todo document

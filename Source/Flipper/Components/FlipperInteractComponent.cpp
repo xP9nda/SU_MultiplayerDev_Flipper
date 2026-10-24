@@ -4,6 +4,7 @@
 #include "FlipperInteractComponent.h"
 
 #include "Interfaces/FlipperInteract.h"
+#include "Interfaces/FlipperOutline.h"
 
 
 // Sets default values for this component's properties
@@ -22,9 +23,11 @@ UFlipperInteractComponent::UFlipperInteractComponent()
 void UFlipperInteractComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
+	// always start the timer for the looking at actor handler, as at this point the controller might not be available by the time BeginPlay runs
+	// so outlines might work for a listen server host but not on clients
+	// this is why the locally controlled check is part of the timer handler function
+	GetWorld()->GetTimerManager().SetTimer(LookingAtActorTimerHandle, this, &UFlipperInteractComponent::LookingAtActorTimerHandler, LookingAtActorTimerDelay, true);
 }
 
 
@@ -35,6 +38,41 @@ void UFlipperInteractComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+// static helper to get the outline interface from a given actor
+static IFlipperOutline* GetOutlineInterface(const AActor* Actor)
+{
+	if (!Actor) return nullptr;
+	return Cast<IFlipperOutline>(Actor->FindComponentByInterface(UFlipperOutline::StaticClass()));
+}
+
+void UFlipperInteractComponent::LookingAtActorTimerHandler()
+{
+	// only perform the look-at line-trace on the owning client - not on the server and proxies of other players
+	const APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (!OwnerPawn || !OwnerPawn->IsLocallyControlled()) return;
+
+	const FHitResult Hit = PerformLinetrace();
+	AActor* HitActor = Hit.bBlockingHit ? Hit.GetActor() : nullptr;
+	
+	if (HitActor == PreviouslyLookedAtActor.Get()) return; // already looking at the actor
+	
+	// hide the outline on the previously looked at actor, if it's still valid and exists
+	IFlipperOutline* PreviousOutline = GetOutlineInterface(PreviouslyLookedAtActor.Get());
+	if (PreviousOutline)
+	{
+		PreviousOutline->HideOutline();
+	}
+
+	PreviouslyLookedAtActor = HitActor;
+	
+	// show the outline on the currently looked at actor, if it's still valid and exists
+	IFlipperOutline* Outline = GetOutlineInterface(HitActor);
+	if (Outline)
+	{
+		Outline->ShowOutline();
+	}
 }
 
 FHitResult UFlipperInteractComponent::PerformLinetrace() // todo - document
@@ -55,13 +93,13 @@ FHitResult UFlipperInteractComponent::PerformLinetrace() // todo - document
 		CollisionParams
 	);
 	
-	DrawDebugLine(GetWorld(),
-		StartLocation,
-(StartRotation.Vector() * InteractionDistance) + StartLocation,
-		FColor::Red,
-		false,
-		2.0f
-	);
+// 	DrawDebugLine(GetWorld(),
+// 		StartLocation,
+// (StartRotation.Vector() * InteractionDistance) + StartLocation,
+// 		FColor::Red,
+// 		false,
+// 		2.0f
+// 	);
 	
 	return Hit;
 }
