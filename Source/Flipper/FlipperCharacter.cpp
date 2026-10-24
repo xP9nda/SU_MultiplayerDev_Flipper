@@ -49,10 +49,13 @@ AFlipperCharacter::AFlipperCharacter()
 	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
 	
 	// Usable Units
-	// - Paint
-	PaintComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("PaintComponent"));
-	// - Wallpaper
-	WallpaperComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("WallpaperComponent")); 
+	// commented out in favour of adding them in the blueprint
+	// adding them in bp leaves it more modular and designer friendly, no c++ change needed to add usable unit components
+	// this works as the properties exposed on the component drive the kind of utility it has
+	// // - Paint
+	// PaintComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("PaintComponent"));
+	// // - Wallpaper
+	// WallpaperComponent = CreateDefaultSubobject<UFlipperUsableUnitComponent>(TEXT("WallpaperComponent")); 
 }
 
 void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

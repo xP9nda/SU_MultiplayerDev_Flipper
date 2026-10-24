@@ -38,11 +38,14 @@ class AFlipperCharacter : public ACharacter
 	TObjectPtr<UFlipperInteractComponent> InteractionComponent;
 	
 	// Usable Units
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UFlipperUsableUnitComponent> PaintComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UFlipperUsableUnitComponent> WallpaperComponent;
+	// commented out in favour of adding them in the blueprint
+	// adding them in bp leaves it more modular and designer friendly, no c++ change needed to add usable unit components
+	// this works as the properties exposed on the component drive the kind of utility it has
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	// TObjectPtr<UFlipperUsableUnitComponent> PaintComponent;
+	//
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	// TObjectPtr<UFlipperUsableUnitComponent> WallpaperComponent;
 
 protected:
 
