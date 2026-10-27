@@ -74,7 +74,7 @@ void AFlipperPaintableMesh::OnRep_PaintState()
 {
 	if (MaxPaintableSteps == 0) return;
 	if (!DesiredMaterialDynamic) return;
-	if (CurrentFinish == FGameplayTag::EmptyTag) return;
+	if (!CurrentFinish.IsValid()) return;
 	
 	// get the game instance
 	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
