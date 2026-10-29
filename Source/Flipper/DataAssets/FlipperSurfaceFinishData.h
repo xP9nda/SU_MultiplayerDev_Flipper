@@ -22,16 +22,15 @@ struct FLIPPER_API FFlipperSurfaceFinish
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FLinearColor SurfaceColour = FLinearColor::White;
 	
-	// The texture applied to the surface for the material
-	// This is only applied to the start texture for a paintable mesh. Target texture remains as whatever the starting surface texture of the starting finish is
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> StartingSurfaceTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Categories = "Materials"))
+	FGameplayTag MaterialTexture;
 	
-	// The texture lerped towards as the target
-	// This should be left null on most finishes, and is only to be used when the target texture may differ from the starting finish's texture
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> FinishedSurfaceTexture;
+	// The paint that produces this finish when a paintable mesh targets it, e.g. Finish.Paint.Red for Finish.Brick.Red
+	// leave empty on paint finishes, as they apply themselves
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Categories = "Finish"))
+	FGameplayTag AppliedByPaint;
 };
+
 
 
 /**
@@ -44,8 +43,15 @@ class FLIPPER_API UFlipperSurfaceFinishData : public UDataAsset
 	
 public:
 	// const so that the returned finish cannot be written into, read-only
-	const FFlipperSurfaceFinish* GetFinish(const FGameplayTag& Tag) const { return Finishes.Find(Tag); } 
+	const FFlipperSurfaceFinish* GetFinish(const FGameplayTag& Tag) const { return Finishes.Find(Tag); }
+	UTexture* GetMaterialTexture(const FGameplayTag& Tag) const { return MaterialTextures.Find(Tag) == nullptr ? nullptr : MaterialTextures.Find(Tag)->Get(); }
+	
+	// the finish a surface ends up with when painted with PaintFinish, given the finish that surface wants
+	FGameplayTag ResolveAppliedFinish(const FGameplayTag& PaintFinish, const FGameplayTag& TargetFinish) const;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Surfaces", meta = (Categories = "Finish"))
 	TMap<FGameplayTag, FFlipperSurfaceFinish> Finishes;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Surfaces", meta = (Categories = "Materials"))
+	TMap<FGameplayTag, TObjectPtr<UTexture>> MaterialTextures;
 };

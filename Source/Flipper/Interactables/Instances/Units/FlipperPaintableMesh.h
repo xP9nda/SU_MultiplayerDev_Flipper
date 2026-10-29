@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperPaintableMesh.generated.h"
 
@@ -25,7 +26,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	
-	UPROPERTY(EditAnywhere, Category = "Flipper|Mesh")
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	TObjectPtr<UMaterialInterface> DesiredMaterial;
 	
 	UPROPERTY()
@@ -39,10 +40,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialTargetTextureParameterName = FName("TargetTexture");
-	
-	// scalar as a boolean. set to 1.0f to use the target texture
-	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
-	FName MaterialUseTargetTextureParameterName = FName("UseTargetTexture");
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialStartColourParameterName = FName("StartColour");
@@ -67,6 +64,8 @@ private:
 	// The current finish being applied to the paintable mesh, i.e. whatever a user who paints finish is
 	UPROPERTY(ReplicatedUsing = OnRep_PaintState)
 	FGameplayTag CurrentFinish;
+	
+	const UFlipperSurfaceFinishData* GetSurfaceData() const;
 	
 	UFUNCTION()
 	void OnRep_PaintState();

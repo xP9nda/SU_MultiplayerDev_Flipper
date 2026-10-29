@@ -43,16 +43,11 @@ void AFlipperUnitProvider::SetupMaterial()
 			{
 				// update the colour and texture with whatever surface finish is given out by this unit provider
 				FillMaterialDynamic->SetVectorParameterValue(MaterialProvidedColourParameterName, ProvidedSurfaceFinish->SurfaceColour);
-				
-				if (ProvidedSurfaceFinish->FinishedSurfaceTexture)
+			
+				UTexture* ProvidedTexture = GameInstance->SurfaceData->GetMaterialTexture(ProvidedSurfaceFinish->MaterialTexture);
+				if (ProvidedTexture)
 				{
-					// have the unit provider adopt the look of the target texture, i.e. how the paintable mesh will look once it has been painted
-					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->FinishedSurfaceTexture);
-				}
-				else
-				{
-					// if there's no target texture, then show the starting texture on the unit provider
-					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedSurfaceFinish->StartingSurfaceTexture);
+					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedTexture);
 				}
 			}
 		}

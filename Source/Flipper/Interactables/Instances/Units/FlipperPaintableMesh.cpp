@@ -44,60 +44,75 @@ void AFlipperPaintableMesh::BeginPlay()
 	// don't continue if no dynamic material at this point
 	if (!DesiredMaterialDynamic) return;
 	
-	if (!StartFinish.IsValid())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("StartFinish is null on: %s"), *this->GetName());
-		return;
-	}
+	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
+	const FFlipperSurfaceFinish* StartSurfaceFinish = SurfaceData ? SurfaceData->GetFinish(StartFinish) : nullptr;
 	
-	// ensure default material parameters are applied
-	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
-	if (GameInstance && GameInstance->SurfaceData)
+	if (StartSurfaceFinish)
 	{
-		// start finish is valid at this point
-		// get the starting surface finish from the game instance data asset and ensure the material is set up with that information
-		const FFlipperSurfaceFinish* StartSurfaceFinish = GameInstance->SurfaceData->GetFinish(StartFinish);
-		if (StartSurfaceFinish)
+		// the starting look of the paintable mesh comes entirely from the start finish's colour and texture
+		DesiredMaterialDynamic->SetVectorParameterValue(MaterialStartColourParameterName, StartSurfaceFinish->SurfaceColour);
+		
+		UTexture* StartTexture = SurfaceData->GetMaterialTexture(StartSurfaceFinish->MaterialTexture);
+		if (StartTexture)
 		{
-			// update the start colour and texture with whatever surface finish is set to be the current one
-			DesiredMaterialDynamic->SetVectorParameterValue(MaterialStartColourParameterName, StartSurfaceFinish->SurfaceColour);
-			DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartSurfaceFinish->StartingSurfaceTexture);
+			DesiredMaterialDynamic->SetTextureParameterValue(MaterialStartTextureParameterName, StartTexture);
 		}
-	
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No texture found for %s (start finish %s) on: %s"), *StartSurfaceFinish->MaterialTexture.ToString(), *StartFinish.ToString(), *this->GetName());
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartFinish is missing or not in SurfaceData on: %s"), *this->GetName());
 	}
 	
-	// ensure a late joiner receives an update visual of the paintable mesh
+	// ensure a late joiner receives updated visuals of the paintable mesh
 	OnRep_PaintState();
+}
+
+const UFlipperSurfaceFinishData* AFlipperPaintableMesh::GetSurfaceData() const
+{
+	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
+	return GameInstance ? GameInstance->SurfaceData : nullptr;
 }
 
 void AFlipperPaintableMesh::OnRep_PaintState()
 {
 	if (MaxPaintableSteps == 0) return;
 	if (!DesiredMaterialDynamic) return;
-	if (!CurrentFinish.IsValid()) return;
 	
-	// get the game instance
-	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
-	if (GameInstance && GameInstance->SurfaceData)
-	{
-		// get the currently being painted surface finish from the game instance data asset
-		const FFlipperSurfaceFinish* TargetSurfaceFinish = GameInstance->SurfaceData->GetFinish(CurrentFinish);
-		if (TargetSurfaceFinish)
-		{
-			// update the target colour with whatever surface finish the player has 'equipped'
-			DesiredMaterialDynamic->SetVectorParameterValue(MaterialTargetColourParameterName, TargetSurfaceFinish->SurfaceColour);
-			
-			// if the target surface finish has a target texture, then set the target texture to be the final result
-			if (TargetSurfaceFinish->FinishedSurfaceTexture)
-			{
-				DesiredMaterialDynamic->SetTextureParameterValue(MaterialTargetTextureParameterName, TargetSurfaceFinish->FinishedSurfaceTexture);
-				DesiredMaterialDynamic->SetScalarParameterValue(MaterialUseTargetTextureParameterName, 1.0f); // scalar as a boolean. set to 1.0f to use the target texture. one is provided here, so we use it
-			}
-		}
-	}
-	
+	// always apply progress, so an unpainted wall shows the start finish regardless of the material's default progress
 	const float PaintProgress = static_cast<float>(CurrentPaintableStep) / static_cast<float>(MaxPaintableSteps);
 	DesiredMaterialDynamic->SetScalarParameterValue(MaterialProgressParameterName, PaintProgress);
+	
+	if (!CurrentFinish.IsValid()) return;
+	
+	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
+	const FFlipperSurfaceFinish* CurrentSurfaceFinish = SurfaceData ? SurfaceData->GetFinish(CurrentFinish) : nullptr;
+	
+	if (CurrentSurfaceFinish)
+	{
+		// always set the target colour, texture finishes are set as white so the texture ends up not tinted
+		DesiredMaterialDynamic->SetVectorParameterValue(MaterialTargetColourParameterName, CurrentSurfaceFinish->SurfaceColour);
+		
+		FGameplayTag TargetTextureTag = CurrentSurfaceFinish->MaterialTexture;
+		if (!TargetTextureTag.IsValid())
+		{
+			// if target material texture is not valid, replace the texture on the wall with the start finish's texture
+			const FFlipperSurfaceFinish* StartSurfaceFinish = SurfaceData->GetFinish(StartFinish);
+			if (StartSurfaceFinish)
+			{
+				TargetTextureTag = StartSurfaceFinish->MaterialTexture;
+			}
+		}
+		
+		UTexture* TargetTexture = SurfaceData->GetMaterialTexture(TargetTextureTag);
+		if (TargetTexture)
+		{
+			DesiredMaterialDynamic->SetTextureParameterValue(MaterialTargetTextureParameterName, TargetTexture);
+		}
+	}
 }
 
 // Called every frame
@@ -126,9 +141,14 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 	if (UnitsComponent->GetUsableUnits() == 0) return;
 	
 	// don't allow players with no finish to visually wipe a wall's progress
-	if (UnitsComponent->GetCurrentFinish() == FGameplayTag::EmptyTag) return;
+	const FGameplayTag HeldFinish = UnitsComponent->GetCurrentFinish();
+	if (!HeldFinish.IsValid()) return;
 	
-	CurrentFinish = UnitsComponent->GetCurrentFinish();
+	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
+	if (!SurfaceData) return;
+	
+	// the held paint decides what this wall becomes, e.g. red paint on a wall that wants red brick becomes red brick
+	CurrentFinish = SurfaceData->ResolveAppliedFinish(HeldFinish, TargetFinish);
 	
 	// check the current paintable step AND unit consume at once,
 	// so that a completed wall can still be re-finished, but an incomplete wall will use a unit and advance progress
