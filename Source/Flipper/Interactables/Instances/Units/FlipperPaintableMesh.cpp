@@ -133,7 +133,7 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 	if (!HasAuthority()) return;
 	
 	// get the units component for the relevant unit type
-	UFlipperUsableUnitComponent* UnitsComponent = UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, UnitType);
+	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!UnitsComponent) return;
 
 	// if the user has no usable units to use, cancel

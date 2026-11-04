@@ -3,6 +3,9 @@
 
 #include "FlipperUnitsBaseInteractable.h"
 
+#include "Components/FlipperToolComponent.h"
+#include "Components/FlipperUsableUnitComponent.h"
+
 
 // Sets default values
 AFlipperUnitsBaseInteractable::AFlipperUnitsBaseInteractable()
@@ -16,6 +19,15 @@ void AFlipperUnitsBaseInteractable::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+UFlipperUsableUnitComponent* AFlipperUnitsBaseInteractable::GetActiveUnitsComponent(AActor* Interactor) const
+{
+	const UFlipperToolComponent* ToolComponent = Interactor ? Interactor->FindComponentByClass<UFlipperToolComponent>() : nullptr;
+	if (!ToolComponent || !ToolComponent->GetCurrentTool().MatchesTagExact(UnitType)) return nullptr;
+	
+	// only return the usable unit component if the current tool matches the unit type
+	return UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, UnitType);
 }
 
 // Called every frame

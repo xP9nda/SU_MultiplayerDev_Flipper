@@ -103,7 +103,7 @@ void AFlipperUnitProvider::Interact_Implementation(AActor* Interactor)
 	if (RemainingUnits == 0) return;
 	if (ProvidedFinish == FGameplayTag::EmptyTag) return;
 	
-	UFlipperUsableUnitComponent* UnitsComponent = UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, UnitType);
+	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!UnitsComponent) return;
 
 	// update the current finish on the units component to whatever this unit provider sets

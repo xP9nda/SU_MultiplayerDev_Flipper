@@ -4,8 +4,8 @@
 #include "FlipperUnitsWidget.h"
 
 #include "FlipperGameInstance.h"
+#include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
-#include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
@@ -14,31 +14,23 @@ void UFlipperUnitsWidget::NativeConstruct()
 	Super::NativeConstruct();
 	
 	AController* OwningController = GetOwningPlayer();
-	if (!OwningController)
-	{
-		UpdateVisibility();
-		return;
-	}
+	if (!OwningController) return;
 	
 	// bind to a new pawn, so that if the character is slow to spawn in, the component delegate bindings are still set up
 	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperUnitsWidget::HandlePossessedPawnChanged);
-	ObserveComponent(UFlipperUsableUnitComponent::FindUnitComponentOfType(OwningController->GetPawn(), UnitType));
+	
+	APawn* OwningPawn = OwningController->GetPawn();
+	if (!OwningPawn) return;
+	
+	UFlipperToolComponent* ToolComponent = OwningPawn->GetComponentByClass<UFlipperToolComponent>();
+	if (!ToolComponent) return;
+	
+	ObserveToolComponent(ToolComponent);
 }
 
 void UFlipperUnitsWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	
-	if (IsValid(UnitIcon) && IsValid(UnitIconTexture))
-	{
-		UnitIcon->SetBrushFromTexture(UnitIconTexture);
-	}
-	
-	// don't hide the widget when it's displayed in the designer
-	if (!IsDesignTime())
-	{
-		UpdateVisibility();
-	}
 }
 
 void UFlipperUnitsWidget::NativeDestruct()
@@ -51,12 +43,13 @@ void UFlipperUnitsWidget::NativeDestruct()
 	}
 	
 	// force no new component and therefore a clean-up on the old component bindings
-	ObserveComponent(nullptr);
+	ObserveToolComponent(nullptr);
+	ObserveUnitsComponent(nullptr);
 	
 	Super::NativeDestruct();
 }
 
-void UFlipperUnitsWidget::ObserveComponent(UFlipperUsableUnitComponent* NewComponent)
+void UFlipperUnitsWidget::ObserveUnitsComponent(UFlipperUsableUnitComponent* NewComponent)
 {
 	// if a component was being observed, unbind its delegates
 	if (IsValid(ObservedUnitComponent))
@@ -76,18 +69,56 @@ void UFlipperUnitsWidget::ObserveComponent(UFlipperUsableUnitComponent* NewCompo
 		UpdateDisplay();
 	}
 	
-	UpdateVisibility();
+	if (!IsValid(ObservedUnitComponent))
+	{
+		// if there's no units component then clear the display
+		// otherwise old tool values might still appear on screen
+		ClearDisplay();
+	}
+}
+
+void UFlipperUnitsWidget::ObserveToolComponent(UFlipperToolComponent* NewComponent)
+{
+	if (IsValid(ObservedToolComponent))
+	{
+		ObservedToolComponent->OnToolChanged.RemoveDynamic(this, &UFlipperUnitsWidget::HandleToolChanged);
+	}
+	
+	ObservedToolComponent = NewComponent;
+	if (IsValid(ObservedToolComponent))
+	{
+		ObservedToolComponent->OnToolChanged.AddUniqueDynamic(this, &UFlipperUnitsWidget::HandleToolChanged);
+		HandleToolChanged(ObservedToolComponent->GetCurrentTool());
+	}
+	else
+	{
+		// if there's no tool component then there's no units to show, so unbind the unit component too
+		ObserveUnitsComponent(nullptr);
+	}
+}
+
+void UFlipperUnitsWidget::HandleToolChanged(FGameplayTag NewTool)
+{
+	if (!IsValid(ObservedToolComponent)) return;
+	
+	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
+	const FText* CurrentToolName = GameInstance ? GameInstance->ToolNames.Find(NewTool) : nullptr;
+	CurrentToolDisplayNameText->SetText(CurrentToolName ? *CurrentToolName : FText::FromString("-"));
+	
+	ObserveUnitsComponent(UFlipperUsableUnitComponent::FindUnitComponentOfType(ObservedToolComponent->GetOwner(), NewTool));
 }
 
 void UFlipperUnitsWidget::HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 {
-	ObserveComponent(UFlipperUsableUnitComponent::FindUnitComponentOfType(NewPawn, UnitType));
+	ObserveToolComponent(NewPawn ? NewPawn->GetComponentByClass<UFlipperToolComponent>() : nullptr);
 }
 
-void UFlipperUnitsWidget::UpdateVisibility()
+void UFlipperUnitsWidget::ClearDisplay()
 {
-	// hide the widget if there's no usable unit component, or if the unit type is empty
-	SetVisibility(ObservedUnitComponent && UnitType.IsValid() ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	CurrentUnitsAvailableText->SetText(FText::FromString("-"));
+	MaxUnitsAvailableText->SetText(FText::FromString("-"));
+	CurrentFinishDisplayNameText->SetText(FText::FromString("-"));
+	UnitsProgressBar->SetPercent(0.0f);
 }
 
 void UFlipperUnitsWidget::UpdateDisplay()
@@ -106,16 +137,18 @@ void UFlipperUnitsWidget::UpdateDisplay()
 	// avoid the div by 0 by setting it manually if any unit values are 0
 	UnitsProgressBar->SetPercent(CurrentUnits == 0 || MaxUsableUnits == 0 ? 0.0f : static_cast<float>(CurrentUnits) / static_cast<float>(MaxUsableUnits));
 	
-	// update the current finish info (progress bar colour and finish display name)
 	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
+	if (!GameInstance) return;
 	
-	if (!GameInstance || !GameInstance->SurfaceData)
+	// update the current finish info (progress bar colour and finish display name)
+	if (!GameInstance->SurfaceData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SurfaceData in GameInstance is null"));
 		CurrentFinishDisplayNameText->SetText(FText::FromString("-"));
 		return;
 	}
 	
+	// get the finish information about the current finish
 	const FFlipperSurfaceFinish* FinishData = GameInstance->SurfaceData->GetFinish(CurrentFinish);
 	if (FinishData)
 	{
@@ -130,9 +163,6 @@ void UFlipperUnitsWidget::UpdateDisplay()
 			UE_LOG(LogTemp, Warning, TEXT("FlipperUnitsWidget: CurrentFinish (%s) is missing from GameInstance->SurfaceData"), *CurrentFinish.ToString());
 		}
 	}
-	
-	
-	UpdateVisibility();
 }
 
 

@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "FlipperUnitsWidget.generated.h"
 
+class UFlipperToolComponent;
 class UFlipperUsableUnitComponent;
 class UProgressBar;
 class UImage;
@@ -26,18 +27,12 @@ protected:
 
 	UFUNCTION()
 	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipper|Units", meta = (Categories = "Units"))
-	FGameplayTag UnitType;
-	
+
 	UPROPERTY(BlueprintReadOnly, Category = "Flipper|Units")
 	TObjectPtr<UFlipperUsableUnitComponent> ObservedUnitComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flipper|UI")
-	TObjectPtr<UTexture2D> UnitIconTexture;
 	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> UnitIcon;
+	UPROPERTY(BlueprintReadOnly, Category = "Flipper|Units")
+	TObjectPtr<UFlipperToolComponent> ObservedToolComponent;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> MaxUnitsAvailableText;
@@ -49,12 +44,19 @@ protected:
 	TObjectPtr<UTextBlock> CurrentFinishDisplayNameText;
 	
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CurrentToolDisplayNameText;
+	
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> UnitsProgressBar;
 	
 private:
-	void ObserveComponent(UFlipperUsableUnitComponent* NewComponent);
-	void UpdateVisibility();
+	void ObserveUnitsComponent(UFlipperUsableUnitComponent* NewComponent);
+	void ObserveToolComponent(UFlipperToolComponent* NewComponent);
 	
+	UFUNCTION()
+	void HandleToolChanged(FGameplayTag NewTool);
+
+	void ClearDisplay();
 	UFUNCTION()
 	void UpdateDisplay();
 };

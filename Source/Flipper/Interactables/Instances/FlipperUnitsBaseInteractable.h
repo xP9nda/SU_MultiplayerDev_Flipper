@@ -7,6 +7,8 @@
 #include "Interactables/FlipperBaseInteractable.h"
 #include "FlipperUnitsBaseInteractable.generated.h"
 
+class UFlipperUsableUnitComponent;
+
 UCLASS(Abstract)
 class FLIPPER_API AFlipperUnitsBaseInteractable : public AFlipperBaseInteractable
 {
@@ -22,6 +24,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Flipper|Config", meta = (Categories = "Units"))
 	FGameplayTag UnitType;
+	
+	UFlipperUsableUnitComponent* GetActiveUnitsComponent(AActor* Interactor) const;
 	
 public:
 	// Called every frame

@@ -18,4 +18,7 @@ class FLIPPER_API UFlipperGameInstance : public UGameInstance
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Surfaces")
 	TObjectPtr<UFlipperSurfaceFinishData> SurfaceData;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Tools", meta = (Categories = "Units"))
+	TMap<FGameplayTag, FText> ToolNames;
 };

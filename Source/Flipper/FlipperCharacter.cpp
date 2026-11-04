@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Flipper.h"
 #include "Components/FlipperInteractComponent.h"
-#include "Components/FlipperUsableUnitComponent.h"
+#include "Components/FlipperToolComponent.h"
 
 AFlipperCharacter::AFlipperCharacter()
 {
@@ -47,6 +47,7 @@ AFlipperCharacter::AFlipperCharacter()
 	
 	// Interaction  - todo document
 	InteractionComponent = CreateDefaultSubobject<UFlipperInteractComponent>(TEXT("InteractionComponent"));
+	ToolComponent = CreateDefaultSubobject<UFlipperToolComponent>(TEXT("ToolComponent"));
 	
 	// Usable Units
 	// commented out in favour of adding them in the blueprint
@@ -76,6 +77,10 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		
 		// Interaction - todo document
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, InteractionComponent.Get(), &UFlipperInteractComponent::AttemptInteract);
+		
+		// Tool Switching
+		EnhancedInputComponent->BindAction(ToolChangeScrollForwardAction, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolScrollForward);
+		EnhancedInputComponent->BindAction(ToolChangeScrollBackwardAction, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolScrollBackward);
 	}
 	else
 	{
@@ -136,6 +141,17 @@ void AFlipperCharacter::DoJumpEnd()
 	StopJumping();
 }
 
+void AFlipperCharacter::DoToolScrollForward()
+{
+	if (!ToolComponent) return;
+	ToolComponent->CycleTool(1);
+}
+
+void AFlipperCharacter::DoToolScrollBackward()
+{
+	if (!ToolComponent) return;
+	ToolComponent->CycleTool(-1);
+}
 
 
 static FString RoleToString(ENetRole Role)

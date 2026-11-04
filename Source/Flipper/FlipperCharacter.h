@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/FlipperUsableUnitComponent.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "FlipperCharacter.generated.h"
 
+class UFlipperToolComponent;
 class UFlipperInteractComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -36,6 +36,9 @@ class AFlipperCharacter : public ACharacter
 	// Interaction - todo document 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UFlipperInteractComponent> InteractionComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UFlipperToolComponent> ToolComponent;
 	
 	// Usable Units
 	// commented out in favour of adding them in the blueprint
@@ -69,6 +72,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* InteractAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ToolChangeScrollForwardAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ToolChangeScrollBackwardAction;
+	
 public:
 	AFlipperCharacter();
 
@@ -95,6 +104,12 @@ protected:
 	/** Handles jump end inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+	
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoToolScrollForward();
+	
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoToolScrollBackward();
 
 protected:
 
