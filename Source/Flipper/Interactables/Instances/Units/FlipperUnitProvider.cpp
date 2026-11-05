@@ -85,11 +85,6 @@ void AFlipperUnitProvider::OnRep_RemainingUnits()
 	FillStaticMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, Fill));
 }
 
-// Called every frame
-void AFlipperUnitProvider::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 void AFlipperUnitProvider::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

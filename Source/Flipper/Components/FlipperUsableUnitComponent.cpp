@@ -27,16 +27,6 @@ void UFlipperUsableUnitComponent::BeginPlay()
 	
 }
 
-
-// Called every frame
-void UFlipperUsableUnitComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UFlipperUsableUnitComponent::OnRep_UsableUnits() const
 {
 	OnUsableUnitsChanged.Broadcast();

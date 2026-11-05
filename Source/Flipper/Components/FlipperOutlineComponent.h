@@ -25,10 +25,6 @@ private:
 	TArray<TObjectPtr<UStaticMeshComponent>> OwnerStaticMeshes;
 	
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
-	
 	virtual void ShowOutline() override;
 	virtual void HideOutline() override;
 };

@@ -33,9 +33,7 @@ private:
 	void OnRep_IsInteracted();
 	
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
 };

@@ -115,12 +115,6 @@ void AFlipperPaintableMesh::OnRep_PaintState()
 	}
 }
 
-// Called every frame
-void AFlipperPaintableMesh::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AFlipperPaintableMesh::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

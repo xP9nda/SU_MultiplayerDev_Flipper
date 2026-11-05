@@ -30,9 +30,4 @@ UFlipperUsableUnitComponent* AFlipperUnitsBaseInteractable::GetActiveUnitsCompon
 	return UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, UnitType);
 }
 
-// Called every frame
-void AFlipperUnitsBaseInteractable::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 

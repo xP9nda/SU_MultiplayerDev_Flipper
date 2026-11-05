@@ -26,10 +26,7 @@ protected:
 	FGameplayTag UnitType;
 	
 	UFlipperUsableUnitComponent* GetActiveUnitsComponent(AActor* Interactor) const;
-	
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 	
 private:
 	

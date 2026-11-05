@@ -30,16 +30,6 @@ void UFlipperInteractComponent::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(LookingAtActorTimerHandle, this, &UFlipperInteractComponent::LookingAtActorTimerHandler, LookingAtActorTimerDelay, true);
 }
 
-
-// Called every frame
-void UFlipperInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                              FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 // static helper to get the outline interface from a given actor
 static IFlipperOutline* GetOutlineInterface(const AActor* Actor)
 {

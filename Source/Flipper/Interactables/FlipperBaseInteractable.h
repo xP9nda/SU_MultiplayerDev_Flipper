@@ -25,7 +25,5 @@ protected:
 	TWeakObjectPtr<UFlipperOutlineComponent> OutlineComponent;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
 };

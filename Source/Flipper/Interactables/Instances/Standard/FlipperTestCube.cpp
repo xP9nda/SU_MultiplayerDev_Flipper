@@ -36,12 +36,6 @@ void AFlipperTestCube::OnRep_IsInteracted()
 	StaticMeshComponent->SetMaterial(0, InteractedMaterial);
 }
 
-// Called every frame
-void AFlipperTestCube::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AFlipperTestCube::Interact_Implementation(AActor* Interactor)
 {
 	if (bIsInteracted) return;

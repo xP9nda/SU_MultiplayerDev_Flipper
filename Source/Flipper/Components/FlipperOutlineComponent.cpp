@@ -26,15 +26,6 @@ void UFlipperOutlineComponent::BeginPlay()
 }
 
 
-// Called every frame
-void UFlipperOutlineComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                             FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UFlipperOutlineComponent::ShowOutline()
 {
 	for (UStaticMeshComponent* Mesh : OwnerStaticMeshes)
