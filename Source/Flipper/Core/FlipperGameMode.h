@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "FlipperGameMode.generated.h"
 
 /**
  *  Simple GameMode for a first person game
  */
 UCLASS(abstract)
-class AFlipperGameMode : public AGameModeBase
+class AFlipperGameMode : public AGameMode
 {
 	GENERATED_BODY()
 

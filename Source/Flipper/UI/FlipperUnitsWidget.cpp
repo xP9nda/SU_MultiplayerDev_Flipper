@@ -3,11 +3,11 @@
 
 #include "FlipperUnitsWidget.h"
 
-#include "FlipperGameInstance.h"
 #include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Core/FlipperGameInstance.h"
 
 void UFlipperUnitsWidget::NativeConstruct()
 {

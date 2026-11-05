@@ -3,8 +3,8 @@
 
 #include "FlipperPaintableMesh.h"
 
-#include "FlipperGameInstance.h"
 #include "Components/FlipperUsableUnitComponent.h"
+#include "Core/FlipperGameInstance.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Net/UnrealNetwork.h"
 
