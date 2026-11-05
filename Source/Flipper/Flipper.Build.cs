@@ -26,12 +26,6 @@ public class Flipper : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"Flipper",
-			"Flipper/Variant_Horror",
-			"Flipper/Variant_Horror/UI",
-			"Flipper/Variant_Shooter",
-			"Flipper/Variant_Shooter/AI",
-			"Flipper/Variant_Shooter/UI",
-			"Flipper/Variant_Shooter/Weapons"
 		});
 
 		// Uncomment if you are using Slate UI
