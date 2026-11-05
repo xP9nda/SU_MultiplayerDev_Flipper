@@ -143,9 +143,3 @@ void UFlipperInteractComponent::Server_AttemptInteraction_Implementation()
 	// Cast<IFlipperInteract>(Hit.GetActor())->Execute_Interact(Hit.GetActor()); // cast to interact interface to perform interact method
 }
 
-bool UFlipperInteractComponent::Server_AttemptInteraction_Validate()
-{
-	return true;
-}
-
-

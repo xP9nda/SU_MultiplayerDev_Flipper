@@ -46,7 +46,7 @@ private:
 	
 	FHitResult PerformLinetrace();
 
-	UFUNCTION(Server, Reliable, WithValidation, Category="Interaction") // - todo document
+	UFUNCTION(Server, Reliable, Category="Interaction") // - todo document
 	void Server_AttemptInteraction();
 	
 	// server - refers to the next allowed interaction time of the character
