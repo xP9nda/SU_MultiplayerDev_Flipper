@@ -1,0 +1,35 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "FlipperPlayerState.h"
+
+#include "Net/UnrealNetwork.h"
+
+void AFlipperPlayerState::AddSurfaceCompleted()
+{
+	if (!HasAuthority()) return;
+	
+	SurfacesCompleted++;
+	OnRep_ContributionChanged();
+}
+
+void AFlipperPlayerState::AddFundsEarned(int32 Amount)
+{
+	if (!HasAuthority()) return;
+	if (Amount <= 0) return;
+	
+	FundsEarned += Amount;
+	OnRep_ContributionChanged();
+}
+
+void AFlipperPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AFlipperPlayerState, SurfacesCompleted);
+	DOREPLIFETIME(AFlipperPlayerState, FundsEarned);
+}
+
+void AFlipperPlayerState::OnRep_ContributionChanged()
+{
+	OnContributionChanged.Broadcast();
+}

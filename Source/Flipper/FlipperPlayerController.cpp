@@ -8,12 +8,37 @@
 #include "FlipperCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Flipper.h"
+#include "Cheats/FlipperCheatManager.h"
+#include "Core/FlipperGameState.h"
+#include "GameFramework/GameMode.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+
 
 AFlipperPlayerController::AFlipperPlayerController()
 {
 	// set the player camera manager class
 	PlayerCameraManagerClass = AFlipperCameraManager::StaticClass();
+	
+	CheatClass = UFlipperCheatManager::StaticClass();
+}
+
+void AFlipperPlayerController::Server_Cheat_AddFunds_Implementation(int32 Amount)
+{
+#if !UE_BUILD_SHIPPING
+	
+	UWorld* World = GetWorld();
+	if (!World) return;
+	
+	AGameModeBase* AuthGameMode = World->GetAuthGameMode();
+	if (!AuthGameMode) return;
+	if (!AuthGameMode->AllowCheats(this)) return;
+	
+	AFlipperGameState* GameState = Cast<AFlipperGameState>(World->GetGameState());
+	if (!GameState) return;
+	
+	GameState->AddFunds(Amount);
+	
+#endif
 }
 
 void AFlipperPlayerController::BeginPlay()

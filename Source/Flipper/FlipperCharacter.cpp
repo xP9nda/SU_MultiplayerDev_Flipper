@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Flipper.h"
+#include "Cheats/FlipperCheatManager.h"
 #include "Components/FlipperInteractComponent.h"
 #include "Components/FlipperToolComponent.h"
 
@@ -168,8 +169,14 @@ static FString RoleToString(ENetRole Role)
 void AFlipperCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+#if !UE_BUILD_SHIPPING
 	
 	if (!GEngine) return;
+
+	const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	const UFlipperCheatManager* FlipperCheatManager = PlayerController ? Cast<UFlipperCheatManager>(PlayerController->CheatManager) : nullptr;
+	if (!FlipperCheatManager || !FlipperCheatManager->IsNetDebuggingEnabled()) return;
 	
 	const uint64 Key = (uint64)GetUniqueID();
 	const FString Line = FString::Printf(
@@ -182,4 +189,6 @@ void AFlipperCharacter::Tick(float DeltaTime)
 	else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
 
 	GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
+	
+#endif
 }

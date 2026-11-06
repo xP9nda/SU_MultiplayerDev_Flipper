@@ -24,6 +24,10 @@ public:
 	/** Constructor */
 	AFlipperPlayerController();
 
+	// Cheat RPCs
+	UFUNCTION(Server, Reliable)
+	void Server_Cheat_AddFunds(int32 Amount);
+	
 protected:
 
 	/** Input Mapping Contexts */

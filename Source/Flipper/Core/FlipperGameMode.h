@@ -6,10 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "FlipperGameMode.generated.h"
 
-/**
- *  Simple GameMode for a first person game
- */
-UCLASS(abstract)
+UCLASS(Abstract)
 class AFlipperGameMode : public AGameMode
 {
 	GENERATED_BODY()
@@ -19,6 +16,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+private:
+	UPROPERTY(EditDefaultsOnly)
+	int32 StartingMoney = 100;
 	
 };
 
