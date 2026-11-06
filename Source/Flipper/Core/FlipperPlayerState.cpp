@@ -37,7 +37,8 @@ void AFlipperPlayerState::RemoveFundsSpent(int32 Amount)
 	if (Amount <= 0) return;
 	if (Amount > FundsSpent) return;
 	
-	FundsSpent -= Amount;
+	// clamp the funds spent at 0 just to be safe
+	FundsSpent = FMath::Max(FundsSpent - Amount, 0);
 	OnRep_ContributionChanged();
 }
 

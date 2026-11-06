@@ -5,6 +5,7 @@
 
 #include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
+#include "Core/FlipperGameInstance.h"
 
 
 // Sets default values
@@ -28,6 +29,36 @@ UFlipperUsableUnitComponent* AFlipperUnitsBaseInteractable::GetActiveUnitsCompon
 	
 	// only return the usable unit component if the current tool matches the unit type
 	return UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, UnitType);
+}
+
+AFlipperGameState* AFlipperUnitsBaseInteractable::GetFlipperGameState() const
+{
+	UWorld* World = GetWorld();
+	if (!World) return nullptr;
+	
+	return World->GetGameState<AFlipperGameState>();
+}
+
+AFlipperPlayerState* AFlipperUnitsBaseInteractable::GetInteractorPlayerState(AActor* Interactor) const
+{
+	const APawn* InteractorPawn = Cast<APawn>(Interactor);
+	if (!InteractorPawn) return nullptr;
+	
+	AFlipperPlayerState* PlayerState = InteractorPawn->GetPlayerState<AFlipperPlayerState>();
+	if (!PlayerState) return nullptr;
+	
+	return PlayerState;
+}
+
+const UFlipperSurfaceFinishData* AFlipperUnitsBaseInteractable::GetSurfaceData()
+{
+	UWorld* World = GetWorld();
+	if (!World) return nullptr;
+	
+	const UFlipperGameInstance* GameInstance = World->GetGameInstance<UFlipperGameInstance>();
+	if (!GameInstance) return nullptr;
+	
+	return GameInstance->SurfaceData;
 }
 
 

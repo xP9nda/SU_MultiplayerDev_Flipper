@@ -29,6 +29,10 @@ struct FLIPPER_API FFlipperSurfaceFinish
 	// leave empty on paint finishes, as they apply themselves
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Categories = "Finish"))
 	FGameplayTag AppliedByPaint;
+	
+	// The cost of one unit of this finish, in pennies, clamped to 0 so that buying units can't give money
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Unit Price (Pennies)", meta = (ClampMin = "0"))
+	int32 UnitPrice = 0;
 };
 
 

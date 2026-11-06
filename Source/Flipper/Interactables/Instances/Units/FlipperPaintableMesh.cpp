@@ -4,7 +4,6 @@
 #include "FlipperPaintableMesh.h"
 
 #include "Components/FlipperUsableUnitComponent.h"
-#include "Core/FlipperGameInstance.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Net/UnrealNetwork.h"
 
@@ -69,12 +68,6 @@ void AFlipperPaintableMesh::BeginPlay()
 	
 	// ensure a late joiner receives updated visuals of the paintable mesh
 	OnRep_PaintState();
-}
-
-const UFlipperSurfaceFinishData* AFlipperPaintableMesh::GetSurfaceData() const
-{
-	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
-	return GameInstance ? GameInstance->SurfaceData : nullptr;
 }
 
 void AFlipperPaintableMesh::OnRep_PaintState()

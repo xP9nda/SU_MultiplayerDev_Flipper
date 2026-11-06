@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperPaintableMesh.generated.h"
 
@@ -64,8 +63,6 @@ private:
 	// The current finish being applied to the paintable mesh, i.e. whatever a user who paints finish is
 	UPROPERTY(ReplicatedUsing = OnRep_PaintState)
 	FGameplayTag CurrentFinish;
-	
-	const UFlipperSurfaceFinishData* GetSurfaceData() const;
 	
 	UFUNCTION()
 	void OnRep_PaintState();

@@ -7,6 +7,9 @@
 #include "Interactables/FlipperBaseInteractable.h"
 #include "FlipperUnitsBaseInteractable.generated.h"
 
+class UFlipperSurfaceFinishData;
+class AFlipperPlayerState;
+class AFlipperGameState;
 class UFlipperUsableUnitComponent;
 
 UCLASS(Abstract)
@@ -26,7 +29,9 @@ protected:
 	FGameplayTag UnitType;
 	
 	UFlipperUsableUnitComponent* GetActiveUnitsComponent(AActor* Interactor) const;
-
+	AFlipperGameState* GetFlipperGameState() const;
+	AFlipperPlayerState* GetInteractorPlayerState(AActor* Interactor) const;
+	const UFlipperSurfaceFinishData* GetSurfaceData();
 	
 private:
 	

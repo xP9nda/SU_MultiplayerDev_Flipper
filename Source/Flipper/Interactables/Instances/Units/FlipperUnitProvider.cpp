@@ -8,7 +8,6 @@
 #include "Core/FlipperGameState.h"
 #include "Core/FlipperPlayerState.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
-#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -35,19 +34,19 @@ void AFlipperUnitProvider::SetupMaterial()
 		FillStaticMeshComponent->SetMaterial(0, FillMaterialDynamic);
 		
 		// ensure default material parameters are applied
-		const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
-		if (GameInstance && GameInstance->SurfaceData)
+		const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
+		if (SurfaceFinishData)
 		{
 			if (!ProvidedFinish.IsValid()) return; // cancel if there's no provided finish set
 			
 			// get the starting provided finish from the game instance data asset and ensure the material is set up with that information
-			const FFlipperSurfaceFinish* ProvidedSurfaceFinish = GameInstance->SurfaceData->GetFinish(ProvidedFinish);
+			const FFlipperSurfaceFinish* ProvidedSurfaceFinish = SurfaceFinishData->GetFinish(ProvidedFinish);
 			if (ProvidedSurfaceFinish)
 			{
 				// update the colour and texture with whatever surface finish is given out by this unit provider
 				FillMaterialDynamic->SetVectorParameterValue(MaterialProvidedColourParameterName, ProvidedSurfaceFinish->SurfaceColour);
 			
-				UTexture* ProvidedTexture = GameInstance->SurfaceData->GetMaterialTexture(ProvidedSurfaceFinish->MaterialTexture);
+				UTexture* ProvidedTexture = SurfaceFinishData->GetMaterialTexture(ProvidedSurfaceFinish->MaterialTexture);
 				if (ProvidedTexture)
 				{
 					FillMaterialDynamic->SetTextureParameterValue(MaterialProvidedTextureParameterName, ProvidedTexture);
@@ -78,6 +77,10 @@ void AFlipperUnitProvider::Interact_Implementation(AActor* Interactor)
 	AFlipperGameState* FlipperGameState = Cast<AFlipperGameState>(World->GetGameState());
 	if (!FlipperGameState) return;
 	
+	const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
+	const FFlipperSurfaceFinish* ProvidedSurfaceFinish = SurfaceFinishData ? SurfaceFinishData->GetFinish(ProvidedFinish) : nullptr;
+	if (!ProvidedSurfaceFinish) return;
+	
 	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!UnitsComponent) return;
 
@@ -88,8 +91,7 @@ void AFlipperUnitProvider::Interact_Implementation(AActor* Interactor)
 	const uint8 FreeSpace = UnitsComponent->GetMaxUsableUnits() - UnitsComponent->GetUsableUnits();
 	if (FreeSpace == 0) return; // don't allow refilling an already full usable unit component
 	
-	// if the cost per unit is actually something, we want to subtract money
-	const int32 TotalCost = CostPerUnit * static_cast<int32>(FreeSpace);  // cast FreeSpace(uint8) to int32 so total cost isn't capped to 255
+	const int32 TotalCost = ProvidedSurfaceFinish->UnitPrice * static_cast<int32>(FreeSpace);  // cast FreeSpace(uint8) to int32 so total cost isn't capped to 255
 	
 	AFlipperPlayerState* InteractorPlayerState = nullptr;
 	APawn* InteractorPawn = Cast<APawn>(Interactor);

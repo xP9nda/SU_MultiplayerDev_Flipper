@@ -25,10 +25,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> FillStaticMeshComponent;
 	
-	// clamped min to 0 so that buying units can't give money, say from a designer accidentally setting the value incorrectly
-	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", DisplayName = "Cost Per Unit (Pennies)", meta = (ClampMin = "0"))
-	int32 CostPerUnit = 1;
-	
 	UPROPERTY(EditAnywhere, Category = "Flipper|Config", meta = (Categories = "Finish"))
 	FGameplayTag ProvidedFinish;
 	
