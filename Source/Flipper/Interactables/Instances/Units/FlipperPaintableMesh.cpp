@@ -149,3 +149,65 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 	OnRep_PaintState(); // listen server host update
 }
 
+FFlipperInteractText AFlipperPaintableMesh::GetInteractText(AActor* Interactor)
+{
+	FFlipperInteractText NewInteractText = FFlipperInteractText();
+	
+	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
+	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
+	if (!SurfaceData || !UnitsComponent)
+	{
+		// if there's an error getting information about surface data or the units, show a generic message
+		NewInteractText.MainText = FText::FromString("Incorrect Tool");
+		
+		UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
+		if (FlipperGameInstance)
+		{
+			FText DesiredToolDisplayName = FlipperGameInstance->ToolNames.Find(UnitType)->ToLower();
+			NewInteractText.DescriptionText = FText::Format(FText::FromString("Equip your {0}"), DesiredToolDisplayName);
+		}
+		
+		return NewInteractText;
+	}
+	
+	const FFlipperSurfaceFinish* InteractorCurrentFinishData = SurfaceData->GetFinish(UnitsComponent->GetCurrentFinish());
+	if (!InteractorCurrentFinishData)
+	{
+		// if the interactor has no finish held, assume no units either, so prompt them to purchase units at the shop
+		NewInteractText.MainText = FText::FromString("No type is held");
+	}
+	else
+	{
+		// interactor has a valid finish, so show that it can be applied
+		NewInteractText.MainText = FText::Format(FText::FromString("Apply {0}"), InteractorCurrentFinishData->DisplayName);
+	}
+	
+	const FFlipperSurfaceFinish* TargetSurfaceFinishData = SurfaceData->GetFinish(TargetFinish);
+	if (!TargetSurfaceFinishData)
+	{
+		NewInteractText.DescriptionText = FText::FromString("An error occured fetching information for this object");
+	}
+	else
+	{
+		// target surface finish data is valid
+		FText TargetFinishDisplayName = TargetSurfaceFinishData->DisplayName;
+		
+		// if the target finish is applied by paint, show the paint that finishes it instead
+		if (TargetSurfaceFinishData->AppliedByPaint.IsValid())
+		{
+			const FFlipperSurfaceFinish* AppliedBySurfaceFinish = SurfaceData->GetFinish(TargetSurfaceFinishData->AppliedByPaint);
+			// if there's an error finding the applied by surface finish, just show "unknown"
+			TargetFinishDisplayName = AppliedBySurfaceFinish ? AppliedBySurfaceFinish->DisplayName : FText::FromString("unknown");
+		}
+		
+		NewInteractText.DescriptionText = FText::Format(
+			FText::FromString("{0}% done, with {1} type. Wants {2}"),
+			(static_cast<float>(CurrentPaintableStep) / static_cast<float>(MaxPaintableSteps)) * 100,
+			CurrentFinish.MatchesTagExact(TargetFinish) ? FText::FromString("correct") : FText::FromString("incorrect"), 
+			TargetFinishDisplayName
+		);
+	}
+	
+	return NewInteractText;
+}
+

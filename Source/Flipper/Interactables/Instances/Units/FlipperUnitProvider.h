@@ -6,6 +6,25 @@
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperUnitProvider.generated.h"
 
+struct FFlipperSurfaceFinish;
+
+struct FFlipperPurchaseInformation
+{
+	UFlipperUsableUnitComponent* UnitsComponent = nullptr;
+	const FFlipperSurfaceFinish* ProvidedSurfaceFinish = nullptr;
+	uint8 UnitsToPurchase = 0;
+	int32 TotalCost = 0;
+};
+
+enum class EFlipperPurchaseResult : uint8
+{
+	Success,
+	InvalidFinish, // the provided finish is unset or missing from the data asset
+	WrongTool, // the interactor doesn't have the unit provider's tool equipped
+	DifferentFinishHeld, // the interactor is holding units of a different finish than this provider
+	Full // the interactor has no space left to fill
+};
+
 UCLASS()
 class FLIPPER_API AFlipperUnitProvider : public AFlipperUnitsBaseInteractable
 {
@@ -40,6 +59,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialProvidedTextureParameterName = FName("ProvidedTexture");
 	
+	EFlipperPurchaseResult EvaluatePurchaseInformation(AActor* Interactor, FFlipperPurchaseInformation& PurchaseInfo) const;
+	
 public:
 	virtual void Interact_Implementation(AActor* Interactor) override;
+	virtual FFlipperInteractText GetInteractText(AActor* Interactor) override;
 };

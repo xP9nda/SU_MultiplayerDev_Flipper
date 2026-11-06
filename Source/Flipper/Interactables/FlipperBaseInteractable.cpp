@@ -27,3 +27,12 @@ void AFlipperBaseInteractable::Interact_Implementation(AActor* Interactor)
 	UE_LOG(LogTemp, Log, TEXT("Base interactable method fired."));
 }
 
+FFlipperInteractText AFlipperBaseInteractable::GetInteractText(AActor* Interactor)
+{
+	FFlipperInteractText NewInteractText = FFlipperInteractText();
+	NewInteractText.MainText = FText::FromString("Interact");
+	NewInteractText.DescriptionText = FText();
+	
+	return NewInteractText;
+}
+

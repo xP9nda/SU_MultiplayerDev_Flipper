@@ -3,6 +3,7 @@
 
 #include "FlipperUnitProvider.h"
 
+#include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
 #include "Core/FlipperGameInstance.h"
 #include "Core/FlipperGameState.h"
@@ -66,50 +67,127 @@ void AFlipperUnitProvider::BeginPlay()
 	SetupMaterial();
 }
 
+EFlipperPurchaseResult AFlipperUnitProvider::EvaluatePurchaseInformation(AActor* Interactor, FFlipperPurchaseInformation& PurchaseInfo) const
+{
+	if (!ProvidedFinish.IsValid()) return EFlipperPurchaseResult::InvalidFinish;
+	
+	const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
+	PurchaseInfo.ProvidedSurfaceFinish = SurfaceFinishData ? SurfaceFinishData->GetFinish(ProvidedFinish) : nullptr;
+	if (!PurchaseInfo.ProvidedSurfaceFinish) return EFlipperPurchaseResult::InvalidFinish;
+	
+	PurchaseInfo.UnitsComponent = GetActiveUnitsComponent(Interactor);
+	if (!PurchaseInfo.UnitsComponent) return EFlipperPurchaseResult::WrongTool;
+	
+	// don't allow swapping finishes while holding units of a different finish
+	if (PurchaseInfo.UnitsComponent->GetUsableUnits() > 0 && PurchaseInfo.UnitsComponent->GetCurrentFinish() != ProvidedFinish) return EFlipperPurchaseResult::DifferentFinishHeld;
+	
+	// fill whatever space is left and don't allow filling an already full usable unit component
+	PurchaseInfo.UnitsToPurchase = PurchaseInfo.UnitsComponent->GetMaxUsableUnits() - PurchaseInfo.UnitsComponent->GetUsableUnits();
+	if (PurchaseInfo.UnitsToPurchase == 0) return EFlipperPurchaseResult::Full;
+	
+	PurchaseInfo.TotalCost = PurchaseInfo.ProvidedSurfaceFinish->UnitPrice * static_cast<int32>(PurchaseInfo.UnitsToPurchase);
+	return EFlipperPurchaseResult::Success;
+}
+
 void AFlipperUnitProvider::Interact_Implementation(AActor* Interactor)
 {
 	if (!HasAuthority()) return;
 	if (!ProvidedFinish.IsValid()) return;
 	
-	UWorld* World = GetWorld();
-	if (!World) return;
-	
-	AFlipperGameState* FlipperGameState = Cast<AFlipperGameState>(World->GetGameState());
+	AFlipperGameState* FlipperGameState = GetFlipperGameState();
 	if (!FlipperGameState) return;
 	
-	const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
-	const FFlipperSurfaceFinish* ProvidedSurfaceFinish = SurfaceFinishData ? SurfaceFinishData->GetFinish(ProvidedFinish) : nullptr;
-	if (!ProvidedSurfaceFinish) return;
+	FFlipperPurchaseInformation PurchaseInfo;
+	if (EvaluatePurchaseInformation(Interactor, PurchaseInfo) != EFlipperPurchaseResult::Success) return;
 	
-	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
-	if (!UnitsComponent) return;
-
-	// don't allow swapping finishes while holding units of a different finish
-	if (UnitsComponent->GetUsableUnits() > 0 && UnitsComponent->GetCurrentFinish() != ProvidedFinish) return;
-	
-	// work out if the team can afford the purchase of units to the interactor
-	const uint8 FreeSpace = UnitsComponent->GetMaxUsableUnits() - UnitsComponent->GetUsableUnits();
-	if (FreeSpace == 0) return; // don't allow refilling an already full usable unit component
-	
-	const int32 TotalCost = ProvidedSurfaceFinish->UnitPrice * static_cast<int32>(FreeSpace);  // cast FreeSpace(uint8) to int32 so total cost isn't capped to 255
-	
-	AFlipperPlayerState* InteractorPlayerState = nullptr;
-	APawn* InteractorPawn = Cast<APawn>(Interactor);
-	if (InteractorPawn)
-	{
-		InteractorPlayerState = InteractorPawn->GetPlayerState<AFlipperPlayerState>();
-	}
+	AFlipperPlayerState* InteractorPlayerState = GetInteractorPlayerState(Interactor);
 	
 	// if the team can't afford it don't change anything
-	if (TotalCost > 0 && !FlipperGameState->TrySpendFunds(TotalCost, InteractorPlayerState)) return;
+	if (PurchaseInfo.TotalCost > 0 && !FlipperGameState->TrySpendFunds(PurchaseInfo.TotalCost, InteractorPlayerState)) return;
 	
 	// set the finish BEFORE adding units, as TrySetCurrentFinish reads whether UsableUnits is more than 0, so adding units first would make the purchase fail
 	// 
 	// OR operator evaluates left to right so TryAddUnit only runs if the finish was set successfully
 	// https://eel.is/c++draft/expr.log.or "Unlike |, || guarantees left-to-right evaluation; moreover, the second operand is not evaluated if the first operand evaluates to true."
-	if (!UnitsComponent->TrySetCurrentFinish(ProvidedFinish) || !UnitsComponent->TryAddUnit(FreeSpace))
+	if (!PurchaseInfo.UnitsComponent->TrySetCurrentFinish(ProvidedFinish) || !PurchaseInfo.UnitsComponent->TryAddUnit(PurchaseInfo.UnitsToPurchase))
 	{
-		FlipperGameState->RefundFunds(TotalCost, InteractorPlayerState);
+		FlipperGameState->RefundFunds(PurchaseInfo.TotalCost, InteractorPlayerState);
 	}
+}
+
+FFlipperInteractText AFlipperUnitProvider::GetInteractText(AActor* Interactor)
+{
+	FFlipperInteractText NewInteractText = FFlipperInteractText();
+
+	FFlipperPurchaseInformation PurchaseInfo;
+	const EFlipperPurchaseResult PurchaseResult = EvaluatePurchaseInformation(Interactor, PurchaseInfo);
+	
+	// don't show anything if the finish on the provider is invalid
+	if (PurchaseResult == EFlipperPurchaseResult::InvalidFinish) return NewInteractText;
+	
+	NewInteractText.MainText = FText::Format(
+		FText::FromString("Buy {0}"),
+		PurchaseInfo.ProvidedSurfaceFinish->DisplayName
+	);
+	
+	// get the tool name from the game instance
+	UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
+	const FText* FoundToolName = FlipperGameInstance ? FlipperGameInstance->ToolNames.Find(UnitType) : nullptr;
+	FText ToolDisplayName = FoundToolName ? FoundToolName->ToLower() : FText::FromString("tool"); // fallback to a generic name if gameinstance or foundtoolname is invalid
+	
+	switch (PurchaseResult)
+	{
+		case EFlipperPurchaseResult::WrongTool:
+			NewInteractText.DescriptionText = FText::Format(FText::FromString("Equip {0} to buy"), ToolDisplayName);
+			break;
+		
+		case EFlipperPurchaseResult::Full:
+			NewInteractText.DescriptionText = FText::Format(FText::FromString("Your {0} is full"), ToolDisplayName);
+			break;
+	
+		case EFlipperPurchaseResult::DifferentFinishHeld:
+		{
+			const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
+			const FFlipperSurfaceFinish* HeldSurfaceFinish = SurfaceFinishData ? SurfaceFinishData->GetFinish(PurchaseInfo.UnitsComponent->GetCurrentFinish()) : nullptr;
+			if (HeldSurfaceFinish)
+			{
+				NewInteractText.DescriptionText = FText::Format(FText::FromString("You are holding {0}, sell it to buy this"), HeldSurfaceFinish->DisplayName);
+			}
+			else
+			{
+				NewInteractText.DescriptionText = FText::Format(FText::FromString("You aren't holding {0}, sell it to buy this"), PurchaseInfo.ProvidedSurfaceFinish->DisplayName);
+			}
+			break;
+		}
+		
+		case EFlipperPurchaseResult::Success:
+		{
+			FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US"));
+			const FText FormattedTotalCost = FText::AsCurrencyBase(PurchaseInfo.TotalCost, TEXT("USD"), USCulture);
+			const int32 UnitsToPurchase = PurchaseInfo.UnitsToPurchase;
+			
+			// team funds are available on every client as it's in game state, so warn if the team cannot afford the purchase
+			const AFlipperGameState* FlipperGameState = GetFlipperGameState();
+			if (FlipperGameState && PurchaseInfo.TotalCost > FlipperGameState->GetTeamFunds())
+			{
+				const FText FormattedTotalNeededMoney = FText::AsCurrencyBase(PurchaseInfo.TotalCost - FlipperGameState->GetTeamFunds(), TEXT("USD"), USCulture);
+				NewInteractText.DescriptionText = FText::Format(FText::FromString("Team needs {0} more"), FormattedTotalNeededMoney);
+				break;
+			}
+			
+			// pluralisation in FText::Format - https://unreal-garden.com/tutorials/pluralizing-names/#fixing-our-localization-table
+			NewInteractText.DescriptionText = FText::Format(
+				FText::FromString("Buy {0} {0}|plural(one=unit,other=units) for {1}"),
+				UnitsToPurchase,
+				FormattedTotalCost
+			);
+			break;
+		}
+			
+		default:
+			break;
+	}
+	
+	return NewInteractText;
 }
 

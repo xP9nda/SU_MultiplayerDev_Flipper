@@ -71,4 +71,5 @@ public:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
+	virtual FFlipperInteractText GetInteractText(AActor* Interactor) override;
 };

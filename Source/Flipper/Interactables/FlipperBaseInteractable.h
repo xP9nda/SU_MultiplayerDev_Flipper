@@ -26,4 +26,5 @@ protected:
 
 public:
 	virtual void Interact_Implementation(AActor* Interactor) override;
+	virtual FFlipperInteractText GetInteractText(AActor* Interactor) override;
 };

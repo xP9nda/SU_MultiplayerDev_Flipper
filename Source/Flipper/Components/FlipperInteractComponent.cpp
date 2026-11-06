@@ -56,6 +56,7 @@ void UFlipperInteractComponent::LookingAtActorTimerHandler()
 	}
 
 	PreviouslyLookedAtActor = HitActor;
+	OnLookedAtActorChanged.Broadcast(PreviouslyLookedAtActor.Get());
 	
 	// show the outline on the currently looked at actor, if it's still valid and exists
 	IFlipperOutline* Outline = GetOutlineInterface(HitActor);

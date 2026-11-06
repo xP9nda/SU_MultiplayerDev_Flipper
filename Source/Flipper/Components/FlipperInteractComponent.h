@@ -9,6 +9,8 @@
 
 class UCameraComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLookedAtActorChanged, AActor*, NewActor);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIPPER_API UFlipperInteractComponent : public UActorComponent
 {
@@ -36,6 +38,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Interaction")
 	float LookingAtActorTimerDelay = 0.05f;
 
+	FOnLookedAtActorChanged OnLookedAtActorChanged;
+	
 private:
 	FTimerHandle LookingAtActorTimerHandle;
 	TWeakObjectPtr<AActor> PreviouslyLookedAtActor;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Core/FlipperGameInstance.h"
 #include "Interactables/FlipperBaseInteractable.h"
 #include "FlipperUnitsBaseInteractable.generated.h"
 
@@ -31,8 +32,9 @@ protected:
 	UFlipperUsableUnitComponent* GetActiveUnitsComponent(AActor* Interactor) const;
 	AFlipperGameState* GetFlipperGameState() const;
 	AFlipperPlayerState* GetInteractorPlayerState(AActor* Interactor) const;
-	const UFlipperSurfaceFinishData* GetSurfaceData();
-	
+	const UFlipperSurfaceFinishData* GetSurfaceData() const;
+	UFlipperGameInstance* GetFlipperGameInstance() const;
+
 private:
 	
 };

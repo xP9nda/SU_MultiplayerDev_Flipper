@@ -6,9 +6,20 @@
 #include "UObject/Interface.h"
 #include "FlipperInteract.generated.h"
 
+
+USTRUCT()
+struct FFlipperInteractText
+{
+	GENERATED_BODY()
+	
+	FText MainText;
+	FText DescriptionText;
+};
+
+
 // This class does not need to be modified.
 UINTERFACE()
-class UFlipperInteract : public UInterface // - todo document 
+class UFlipperInteract : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -24,4 +35,6 @@ class FLIPPER_API IFlipperInteract
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(AActor* Interactor);
+
+	virtual FFlipperInteractText GetInteractText(AActor* Interactor) = 0;
 };
