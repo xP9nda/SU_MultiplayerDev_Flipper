@@ -22,11 +22,31 @@ void AFlipperPlayerState::AddFundsEarned(int32 Amount)
 	OnRep_ContributionChanged();
 }
 
+void AFlipperPlayerState::AddFundsSpent(int32 Amount)
+{
+	if (!HasAuthority()) return;
+	if (Amount <= 0) return;
+	
+	FundsSpent += Amount;
+	OnRep_ContributionChanged();
+}
+
+void AFlipperPlayerState::RemoveFundsSpent(int32 Amount)
+{
+	if (!HasAuthority()) return;
+	if (Amount <= 0) return;
+	if (Amount > FundsSpent) return;
+	
+	FundsSpent -= Amount;
+	OnRep_ContributionChanged();
+}
+
 void AFlipperPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AFlipperPlayerState, SurfacesCompleted);
 	DOREPLIFETIME(AFlipperPlayerState, FundsEarned);
+	DOREPLIFETIME(AFlipperPlayerState, FundsSpent);
 }
 
 void AFlipperPlayerState::OnRep_ContributionChanged()

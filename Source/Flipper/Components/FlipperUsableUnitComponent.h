@@ -52,11 +52,9 @@ private:
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	// public so that interactables can spend units
 	bool TryConsumeUnit(uint8 Quantity);
-	
-	// public so that interactables can add units
 	bool TryAddUnit(uint8 Quantity);
+	bool TrySetCurrentFinish(const FGameplayTag NewCurrentFinish);
 	
 	FOnUsableUnitsChanged OnUsableUnitsChanged;
 	FOnCurrentFinishChanged OnCurrentFinishChanged;
@@ -71,8 +69,6 @@ public:
 	// getter for current finish so that it can be retrieved by paintables to apply desired finish onto it
 	FGameplayTag GetCurrentFinish() const {return CurrentFinish;}
 	
-	// setters
-	void SetCurrentFinish(const FGameplayTag NewCurrentFinish);
 	
 	// static helper to try and find units component of type, given an actor and a gameplay tag (that refers to `UnitType` property)
 	// used to retrieve separate units across multiple instances of UFlipperUsableUnitComponent on an actor

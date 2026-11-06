@@ -21,8 +21,13 @@ public:
 	UFUNCTION(Exec)
 	void FlipperSetNetDebuggingEnabled(bool IsEnabled);
 	
+	UFUNCTION(Exec)
+	void FlipperSetPlayerStateDebuggingEnabled(bool IsEnabled);
+	
 	bool IsNetDebuggingEnabled() const { return bIsNetDebuggingEnabled; }
+	bool IsPlayerStateDebuggingEnabled() const { return bIsPlayerStateDebuggingEnabled; }
 	
 private:
 	bool bIsNetDebuggingEnabled = false;
+	bool bIsPlayerStateDebuggingEnabled = false;
 };

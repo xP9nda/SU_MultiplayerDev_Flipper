@@ -17,9 +17,12 @@ public:
 	// server only through auth guard
 	void AddSurfaceCompleted();
 	void AddFundsEarned(int32 Amount);
+	void AddFundsSpent(int32 Amount);
+	void RemoveFundsSpent(int32 Amount);
 	
 	int32 GetSurfacesCompleted() const { return SurfacesCompleted; }
 	int32 GetFundsEarned() const { return FundsEarned; }
+	int32 GetFundsSpent() const { return FundsSpent; }
 	
 	FOnContributionChanged OnContributionChanged;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -31,6 +34,9 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
 	int32 FundsEarned = 0;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
+	int32 FundsSpent = 0;
 	
 	UFUNCTION()
 	void OnRep_ContributionChanged();

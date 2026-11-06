@@ -6,6 +6,8 @@
 #include "GameFramework/GameState.h"
 #include "FlipperGameState.generated.h"
 
+class AFlipperPlayerState;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamFundsChanged, int32, NewFunds);
 
 UCLASS()
@@ -14,8 +16,9 @@ class FLIPPER_API AFlipperGameState : public AGameState
 	GENERATED_BODY()
 	
 public:
-	void AddFunds(int32 Amount);
-	bool TrySpendFunds(int32 Amount);
+	void AddFunds(int32 Amount, AFlipperPlayerState* Earner = nullptr);
+	void RefundFunds(int32 Amount, AFlipperPlayerState* Spender = nullptr);
+	bool TrySpendFunds(int32 Amount, AFlipperPlayerState* Spender = nullptr);
 	
 	int32 GetTeamFunds() const { return TeamFunds; }
 	

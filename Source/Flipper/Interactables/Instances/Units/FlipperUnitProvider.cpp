@@ -5,6 +5,8 @@
 
 #include "Components/FlipperUsableUnitComponent.h"
 #include "Core/FlipperGameInstance.h"
+#include "Core/FlipperGameState.h"
+#include "Core/FlipperPlayerState.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Net/UnrealNetwork.h"
 
@@ -63,57 +65,49 @@ void AFlipperUnitProvider::BeginPlay()
 	// set up the material before authority check
 	// so that each client shows the material on its own copy of the actor
 	SetupMaterial();
-	
-	// on the server, set the unit provider to have it's maximum available units
-	if (HasAuthority())
-	{
-		RemainingUnits = MaxUnitsAvailable;
-	}
-	
-	// ensure late joiners see the current state of the unit provider right away
-	OnRep_RemainingUnits();
-}
-
-void AFlipperUnitProvider::OnRep_RemainingUnits()
-{
-	// if all units have been used, hide the mesh
-	FillStaticMeshComponent->SetVisibility(RemainingUnits > 0);
-	
-	// if there aren't any units left, guard against the division by 0
-	if (RemainingUnits == 0) return;
-	
-	const float Fill = static_cast<float>(RemainingUnits) / static_cast<float>(MaxUnitsAvailable);
-	FillStaticMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, Fill));
-}
-
-
-void AFlipperUnitProvider::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AFlipperUnitProvider, RemainingUnits);
 }
 
 void AFlipperUnitProvider::Interact_Implementation(AActor* Interactor)
 {
 	if (!HasAuthority()) return;
-	if (RemainingUnits == 0) return;
-	if (ProvidedFinish == FGameplayTag::EmptyTag) return;
+	if (!ProvidedFinish.IsValid()) return;
+	
+	UWorld* World = GetWorld();
+	if (!World) return;
+	
+	AFlipperGameState* FlipperGameState = Cast<AFlipperGameState>(World->GetGameState());
+	if (!FlipperGameState) return;
 	
 	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!UnitsComponent) return;
 
-	// update the current finish on the units component to whatever this unit provider sets
-	// do this before no unit remaining check, so that even with, for instance, a full paint roller, the 'equipped' finish can be changed
-	UnitsComponent->SetCurrentFinish(ProvidedFinish);
+	// don't allow swapping finishes while holding units of a different finish
+	if (UnitsComponent->GetUsableUnits() > 0 && UnitsComponent->GetCurrentFinish() != ProvidedFinish) return;
 	
+	// work out if the team can afford the purchase of units to the interactor
 	const uint8 FreeSpace = UnitsComponent->GetMaxUsableUnits() - UnitsComponent->GetUsableUnits();
-	uint8 UnitsToGive = FMath::Min(FreeSpace, RemainingUnits);
-	if (UnitsToGive == 0) return; // if there's no units left to give or the interactor units are full already
+	if (FreeSpace == 0) return; // don't allow refilling an already full usable unit component
 	
-	if (UnitsComponent->TryAddUnit(UnitsToGive))
+	// if the cost per unit is actually something, we want to subtract money
+	const int32 TotalCost = CostPerUnit * static_cast<int32>(FreeSpace);  // cast FreeSpace(uint8) to int32 so total cost isn't capped to 255
+	
+	AFlipperPlayerState* InteractorPlayerState = nullptr;
+	APawn* InteractorPawn = Cast<APawn>(Interactor);
+	if (InteractorPawn)
 	{
-		RemainingUnits -= UnitsToGive;
-		OnRep_RemainingUnits(); // trigger a host update of the remaining units
+		InteractorPlayerState = InteractorPawn->GetPlayerState<AFlipperPlayerState>();
+	}
+	
+	// if the team can't afford it don't change anything
+	if (TotalCost > 0 && !FlipperGameState->TrySpendFunds(TotalCost, InteractorPlayerState)) return;
+	
+	// set the finish BEFORE adding units, as TrySetCurrentFinish reads whether UsableUnits is more than 0, so adding units first would make the purchase fail
+	// 
+	// OR operator evaluates left to right so TryAddUnit only runs if the finish was set successfully
+	// https://eel.is/c++draft/expr.log.or "Unlike |, || guarantees left-to-right evaluation; moreover, the second operand is not evaluated if the first operand evaluates to true."
+	if (!UnitsComponent->TrySetCurrentFinish(ProvidedFinish) || !UnitsComponent->TryAddUnit(FreeSpace))
+	{
+		FlipperGameState->RefundFunds(TotalCost, InteractorPlayerState);
 	}
 }
 

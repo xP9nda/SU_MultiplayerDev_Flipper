@@ -17,3 +17,8 @@ void UFlipperCheatManager::FlipperSetNetDebuggingEnabled(bool IsEnabled)
 {
 	bIsNetDebuggingEnabled = IsEnabled;
 }
+
+void UFlipperCheatManager::FlipperSetPlayerStateDebuggingEnabled(bool IsEnabled)
+{
+	bIsPlayerStateDebuggingEnabled = IsEnabled;
+}

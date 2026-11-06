@@ -69,13 +69,23 @@ void UFlipperUsableUnitComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
 	DOREPLIFETIME_CONDITION(UFlipperUsableUnitComponent, CurrentFinish, COND_OwnerOnly);
 }
 
-void UFlipperUsableUnitComponent::SetCurrentFinish(const FGameplayTag NewCurrentFinish)
+bool UFlipperUsableUnitComponent::TrySetCurrentFinish(const FGameplayTag NewCurrentFinish)
 {
-	if (!GetOwner()->HasAuthority()) return;
-	if (NewCurrentFinish == CurrentFinish) return; // don't update the finish if it's already this
+	if (!GetOwner()->HasAuthority()) return false;
+	if (!NewCurrentFinish.IsValid()) return false; // don't allow holding units with no finish
 	
-	CurrentFinish = NewCurrentFinish;
-	OnRep_CurrentFinish();
+	// don't allow holding units of a different finish while holding units of one already
+	if (UsableUnits > 0 && NewCurrentFinish != CurrentFinish) return false;
+	
+	// if it's the same finish, then user is buying more units of what's already equipped
+	// still a successful request, but nothing is changed so no OnRep needs to happen; no unnecessary UI/client updates should occur
+	if (CurrentFinish != NewCurrentFinish)
+	{
+		CurrentFinish = NewCurrentFinish;
+		OnRep_CurrentFinish();
+	}
+
+	return true;
 }
 
 UFlipperUsableUnitComponent* UFlipperUsableUnitComponent::FindUnitComponentOfType(const AActor* Actor, const FGameplayTag& InTag)

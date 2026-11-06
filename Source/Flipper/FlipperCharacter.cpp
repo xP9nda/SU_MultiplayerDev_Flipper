@@ -12,6 +12,7 @@
 #include "Cheats/FlipperCheatManager.h"
 #include "Components/FlipperInteractComponent.h"
 #include "Components/FlipperToolComponent.h"
+#include "Core/FlipperPlayerState.h"
 
 AFlipperCharacter::AFlipperCharacter()
 {
@@ -176,19 +177,37 @@ void AFlipperCharacter::Tick(float DeltaTime)
 
 	const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	const UFlipperCheatManager* FlipperCheatManager = PlayerController ? Cast<UFlipperCheatManager>(PlayerController->CheatManager) : nullptr;
-	if (!FlipperCheatManager || !FlipperCheatManager->IsNetDebuggingEnabled()) return;
+	if (!FlipperCheatManager) return;
+
+	// net debugging
+	if (FlipperCheatManager->IsNetDebuggingEnabled())
+	{
+		const uint64 Key = (uint64)GetUniqueID();
+		const FString Line = FString::Printf(
+			TEXT("%s | Local: %s | Remote: %s | HasAuthority: %s"),
+			*GetName(), *RoleToString(GetLocalRole()), *RoleToString(GetRemoteRole()),
+			HasAuthority() ? TEXT("true") : TEXT("false"));
+
+		FColor Colour = FColor::Yellow;
+		if (GetLocalRole() == ROLE_Authority)            Colour = FColor::Green;
+		else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
+
+		GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
+	}
 	
-	const uint64 Key = (uint64)GetUniqueID();
-	const FString Line = FString::Printf(
-		TEXT("%s | Local: %s | Remote: %s | HasAuthority: %s"),
-		*GetName(), *RoleToString(GetLocalRole()), *RoleToString(GetRemoteRole()),
-		HasAuthority() ? TEXT("true") : TEXT("false"));
+	// player state debugging
+	if (FlipperCheatManager->IsPlayerStateDebuggingEnabled())
+	{
+		AFlipperPlayerState* FlipperPlayerState = GetPlayerState<AFlipperPlayerState>();
+		if (!FlipperPlayerState) return;
+		
+		const uint64 Key = (uint64)GetUniqueID();
+		const FString Line = FString::Printf(
+			TEXT("%s | FUNDS EARNED: %d | FUNDS SPENT: %d | SURFACES COMPLETED: %d"),
+			*GetName(), FlipperPlayerState->GetFundsEarned(), FlipperPlayerState->GetFundsSpent(), FlipperPlayerState->GetSurfacesCompleted());
 
-	FColor Colour = FColor::Yellow;
-	if (GetLocalRole() == ROLE_Authority)            Colour = FColor::Green;
-	else if (GetLocalRole() == ROLE_AutonomousProxy) Colour = FColor::Cyan;
-
-	GEngine->AddOnScreenDebugMessage(Key, 2.0f, Colour, Line);
+		GEngine->AddOnScreenDebugMessage(Key, 2.0f, FColor::Green, Line);
+	}
 	
 #endif
 }

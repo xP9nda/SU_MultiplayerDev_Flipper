@@ -25,11 +25,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> FillStaticMeshComponent;
 	
-	UPROPERTY(EditAnywhere, Category = "Flipper|Config")
-	uint8 MaxUnitsAvailable = 50;
-	
-	UPROPERTY(ReplicatedUsing = OnRep_RemainingUnits)
-	uint8 RemainingUnits = 0;
+	// clamped min to 0 so that buying units can't give money, say from a designer accidentally setting the value incorrectly
+	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", DisplayName = "Cost Per Unit (Pennies)", meta = (ClampMin = "0"))
+	int32 CostPerUnit = 1;
 	
 	UPROPERTY(EditAnywhere, Category = "Flipper|Config", meta = (Categories = "Finish"))
 	FGameplayTag ProvidedFinish;
@@ -46,11 +44,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Mesh")
 	FName MaterialProvidedTextureParameterName = FName("ProvidedTexture");
 	
-	UFUNCTION()
-	void OnRep_RemainingUnits();
-	
 public:
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
 };
