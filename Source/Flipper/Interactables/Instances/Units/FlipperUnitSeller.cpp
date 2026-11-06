@@ -3,6 +3,7 @@
 
 #include "FlipperUnitSeller.h"
 
+#include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
 #include "Core/FlipperGameState.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
@@ -23,7 +24,12 @@ void AFlipperUnitSeller::Interact_Implementation(AActor* Interactor)
 	AFlipperGameState* FlipperGameState = GetFlipperGameState();
 	if (!FlipperGameState) return;
 	
-	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
+	// get the tool component and usable unit component manually rather than through the inherited helper,
+	// as this sell point supports all unit types, driven by the tool the user currently has equipped
+	const UFlipperToolComponent* ToolComponent = Interactor ? Interactor->FindComponentByClass<UFlipperToolComponent>() : nullptr;
+	if (!ToolComponent) return;
+	
+	UFlipperUsableUnitComponent* UnitsComponent = UFlipperUsableUnitComponent::FindUnitComponentOfType(Interactor, ToolComponent->GetCurrentTool());
 	if (!UnitsComponent) return;
 	
 	const uint8 UnitsToSell = UnitsComponent->GetUsableUnits();
@@ -31,7 +37,7 @@ void AFlipperUnitSeller::Interact_Implementation(AActor* Interactor)
 	
 	const UFlipperSurfaceFinishData* SurfaceFinishData = GetSurfaceData();
 	const FFlipperSurfaceFinish* HeldSurfaceFinish = SurfaceFinishData ? SurfaceFinishData->GetFinish(UnitsComponent->GetCurrentFinish()) : nullptr;
-	if (HeldSurfaceFinish) return;
+	if (!HeldSurfaceFinish) return;
 	
 	// round the total refund value down to an int as you can't get more fractional than pennies
 	const int32 TotalRefundValue = FMath::FloorToInt32(static_cast<float>(UnitsToSell) * static_cast<float>(HeldSurfaceFinish->UnitPrice) * SellPercentage);
