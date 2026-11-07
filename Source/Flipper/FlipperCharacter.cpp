@@ -37,6 +37,22 @@ AFlipperCharacter::AFlipperCharacter()
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
 
+	// tool meshes
+	// first person, using SetOnlyOwnerSee and FirstPersonMesh means this is just the arms (as seen locally in first person_
+	ToolMeshComponentFirstPerson = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ToolMesh Component FirstPerson"));
+	ToolMeshComponentFirstPerson->SetupAttachment(FirstPersonMesh, FName("ToolSocket")); // use specifically the first person mesh set up above (main mesh from GetMesh() so that's used in ThirdPerson tool mesh)
+	ToolMeshComponentFirstPerson->SetOnlyOwnerSee(true);
+	ToolMeshComponentFirstPerson->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
+	ToolMeshComponentFirstPerson->SetCollisionProfileName(FName("NoCollision"));
+	ToolMeshComponentFirstPerson->SetCastShadow(false);
+	
+	// full body mesh, everyone except the owner sees this version - for other clients to see the held tool (via SetOwnerNoSee so owner doesn't see this version)
+	ToolMeshComponentThirdPerson = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ToolMesh Component ThirdPerson"));
+	ToolMeshComponentThirdPerson->SetupAttachment(GetMesh(), FName("ToolSocket")); // GetMesh() used as described above
+	ToolMeshComponentThirdPerson->SetOwnerNoSee(true);
+	ToolMeshComponentThirdPerson->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
+	ToolMeshComponentThirdPerson->SetCollisionProfileName(FName("NoCollision"));
+	
 	// configure the character comps
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -155,6 +171,15 @@ void AFlipperCharacter::DoToolScrollBackward()
 	ToolComponent->CycleTool(-1);
 }
 
+void AFlipperCharacter::HandleToolChanged(FGameplayTag NewTool)
+{
+	UStaticMesh* ToolMesh = ToolComponent ? ToolComponent->GetMeshForTool(NewTool) : nullptr;
+	
+	// if ToolMesh is nullptr, still set the static meshes to that nullptr value to clear the meshes and show an empty hand
+	ToolMeshComponentFirstPerson->SetStaticMesh(ToolMesh);
+	ToolMeshComponentThirdPerson->SetStaticMesh(ToolMesh);
+}
+
 
 static FString RoleToString(ENetRole Role)
 {
@@ -210,4 +235,16 @@ void AFlipperCharacter::Tick(float DeltaTime)
 	}
 	
 #endif
+}
+
+void AFlipperCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (!ToolComponent) return;
+	
+	ToolComponent->OnToolChanged.AddDynamic(this, &AFlipperCharacter::HandleToolChanged);
+	
+	// apply the current tool immediately
+	HandleToolChanged(ToolComponent->GetCurrentTool());
 }

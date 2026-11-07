@@ -50,6 +50,12 @@ void UFlipperToolComponent::CycleTool(const int32 Direction)
 	RequestSetTool(AvailableTools[NewToolIndex]);
 }
 
+UStaticMesh* UFlipperToolComponent::GetMeshForTool(FGameplayTag Tool) const
+{
+	const TObjectPtr<UStaticMesh>* ToolMesh = ToolMeshes.Find(Tool);
+	return ToolMesh ? ToolMesh->Get() : nullptr;
+}
+
 
 void UFlipperToolComponent::Server_SetCurrentTool_Implementation(FGameplayTag NewTool)
 {

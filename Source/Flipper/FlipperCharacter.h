@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "FlipperCharacter.generated.h"
@@ -39,6 +40,12 @@ class AFlipperCharacter : public ACharacter
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UFlipperToolComponent> ToolComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components|Tools", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> ToolMeshComponentFirstPerson;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components|Tools", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> ToolMeshComponentThirdPerson;
 	
 	// Usable Units
 	// commented out in favour of adding them in the blueprint
@@ -110,6 +117,9 @@ protected:
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoToolScrollBackward();
+	
+	UFUNCTION()
+	void HandleToolChanged(FGameplayTag NewTool);
 
 protected:
 
@@ -120,12 +130,12 @@ protected:
 	
 
 public:
+	virtual void BeginPlay() override;
 
 	/** Returns the first person mesh **/
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	
 };
 

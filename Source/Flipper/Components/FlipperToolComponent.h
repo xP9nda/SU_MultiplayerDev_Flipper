@@ -24,12 +24,16 @@ public:
 	
 	FGameplayTag GetCurrentTool() const { return CurrentTool; }
 	const TArray<FGameplayTag>& GetAvailableTools() const { return AvailableTools; }
+	UStaticMesh* GetMeshForTool(FGameplayTag Tool) const;
 	
 	FOnToolChanged OnToolChanged;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Tools", meta = (Categories = "Units"))
 	TArray<FGameplayTag> AvailableTools;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|Tools", meta = (Categories = "Units"))
+	TMap<FGameplayTag, TObjectPtr<UStaticMesh>> ToolMeshes;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentTool)
 	FGameplayTag CurrentTool;
