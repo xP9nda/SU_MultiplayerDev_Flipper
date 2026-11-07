@@ -19,7 +19,8 @@ public:
 	UFlipperToolComponent();
 	
 	void RequestSetTool(FGameplayTag NewTool);
-	
+	void SetToolIndex(int32 NewToolIndex);
+
 	void CycleTool(int32 Direction); // +-1, wraps AvailableTools and sends RequestSetTool
 	
 	FGameplayTag GetCurrentTool() const { return CurrentTool; }

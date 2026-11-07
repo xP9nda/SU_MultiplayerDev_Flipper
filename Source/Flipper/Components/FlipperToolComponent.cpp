@@ -33,6 +33,13 @@ void UFlipperToolComponent::RequestSetTool(FGameplayTag NewTool)
 	Server_SetCurrentTool(NewTool);
 }
 
+void UFlipperToolComponent::SetToolIndex(int32 NewToolIndex)
+{
+	if (!AvailableTools.IsValidIndex(NewToolIndex)) return;
+	
+	RequestSetTool(AvailableTools[NewToolIndex]);
+}
+
 void UFlipperToolComponent::CycleTool(const int32 Direction)
 {
 	if (AvailableTools.IsEmpty()) return;

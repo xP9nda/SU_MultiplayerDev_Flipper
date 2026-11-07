@@ -5,6 +5,7 @@
 
 #include "Components/FlipperToolComponent.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 
 void UFlipperToolWidget::NativePreConstruct()
 {
@@ -12,6 +13,9 @@ void UFlipperToolWidget::NativePreConstruct()
 	
 	if (!ToolImageWidget || !ToolImageTexture) return;
 	ToolImageWidget->SetBrushFromTexture(ToolImageTexture);
+	
+	if (!ToolKeyTextBlock) return;
+	ToolKeyTextBlock->SetText(ToolKeyText);
 }
 
 void UFlipperToolWidget::NativeConstruct()

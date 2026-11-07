@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "FlipperToolWidget.generated.h"
 
+class UTextBlock;
 class UFlipperToolComponent;
 class UImage;
 /**
@@ -34,8 +35,14 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ToolImageWidget;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> ToolKeyTextBlock;
+	
 	UPROPERTY(EditAnywhere, Category = "Flipper|UI")
 	TObjectPtr<UTexture2D> ToolImageTexture;
+	
+	UPROPERTY(EditAnywhere, Category = "Flipper|UI")
+	FText ToolKeyText;
 	
 	UPROPERTY(EditAnywhere, Category = "Flipper|Units", meta = (Categories = "Units"))
 	FGameplayTag ToolUnitType;

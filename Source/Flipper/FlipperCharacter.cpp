@@ -99,6 +99,10 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Tool Switching
 		EnhancedInputComponent->BindAction(ToolChangeScrollForwardAction, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolScrollForward);
 		EnhancedInputComponent->BindAction(ToolChangeScrollBackwardAction, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolScrollBackward);
+	
+		EnhancedInputComponent->BindAction(ToolbarTool1Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool1);
+		EnhancedInputComponent->BindAction(ToolbarTool2Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool2);
+		EnhancedInputComponent->BindAction(ToolbarTool3Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool3);
 	}
 	else
 	{
@@ -169,6 +173,24 @@ void AFlipperCharacter::DoToolScrollBackward()
 {
 	if (!ToolComponent) return;
 	ToolComponent->CycleTool(-1);
+}
+
+void AFlipperCharacter::DoToolbarTool1()
+{
+	if (!ToolComponent) return;
+	ToolComponent->SetToolIndex(0);
+}
+
+void AFlipperCharacter::DoToolbarTool2()
+{
+	if (!ToolComponent) return;
+	ToolComponent->SetToolIndex(1);
+}
+
+void AFlipperCharacter::DoToolbarTool3()
+{
+	if (!ToolComponent) return;
+	ToolComponent->SetToolIndex(2);
 }
 
 void AFlipperCharacter::HandleToolChanged(FGameplayTag NewTool)

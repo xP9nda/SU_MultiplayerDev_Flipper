@@ -85,6 +85,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ToolChangeScrollBackwardAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
+	UInputAction* ToolbarTool1Action;
+	
+	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
+	UInputAction* ToolbarTool2Action;
+	
+	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
+	UInputAction* ToolbarTool3Action;
+	
 public:
 	AFlipperCharacter();
 
@@ -117,6 +126,15 @@ protected:
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoToolScrollBackward();
+	
+	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
+	virtual void DoToolbarTool1();
+	
+	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
+	virtual void DoToolbarTool2();
+	
+	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
+	virtual void DoToolbarTool3();
 	
 	UFUNCTION()
 	void HandleToolChanged(FGameplayTag NewTool);
