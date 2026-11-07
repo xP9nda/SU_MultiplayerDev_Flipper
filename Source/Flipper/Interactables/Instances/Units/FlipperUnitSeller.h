@@ -32,6 +32,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", meta = (ClampMin = "0", ClampMax = "1"))
 	float SellPercentage = 0.75;
 	
+	// units that should be marked as "earned money", rather than a refund of already spent money
+	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", meta = (Categories = "Units"))
+	FGameplayTagContainer UnitsToEarn;
+	
 	bool TryGetSaleInformation(AActor* Interactor, FFlipperSaleInformation& SaleInfo) const;
 	
 };

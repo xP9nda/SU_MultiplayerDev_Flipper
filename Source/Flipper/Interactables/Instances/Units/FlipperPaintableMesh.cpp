@@ -163,7 +163,7 @@ FFlipperInteractText AFlipperPaintableMesh::GetInteractText(AActor* Interactor)
 		UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
 		if (FlipperGameInstance)
 		{
-			FText DesiredToolDisplayName = FlipperGameInstance->ToolNames.Find(UnitType)->ToLower();
+			const FText DesiredToolDisplayName = FlipperGameInstance->ToolNames.Find(UnitType)->ToLower();
 			NewInteractText.DescriptionText = FText::Format(FText::FromString("Equip your {0}"), DesiredToolDisplayName);
 		}
 		

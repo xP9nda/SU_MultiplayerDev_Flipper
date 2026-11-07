@@ -25,6 +25,7 @@ void AFlipperUnitsBaseInteractable::BeginPlay()
 	
 }
 
+// get the active units component for the held unit type, if the unit type doesn't match the held tool, returns nullptr
 UFlipperUsableUnitComponent* AFlipperUnitsBaseInteractable::GetActiveUnitsComponent(AActor* Interactor) const
 {
 	const UFlipperToolComponent* ToolComponent = Interactor ? Interactor->FindComponentByClass<UFlipperToolComponent>() : nullptr;

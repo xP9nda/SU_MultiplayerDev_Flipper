@@ -24,16 +24,15 @@ public:
 	// Sets default values for this component's properties
 	UFlipperUsableUnitComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 private:
 	UPROPERTY(EditDefaultsOnly, ReplicatedUsing = OnRep_UsableUnits, Category = "Units")
 	uint8 UsableUnits = 0;
 	
 	UPROPERTY(EditAnywhere, Category = "Units")
 	uint8 MaxUsableUnits = 20;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Units", meta = (Categories = "Finish"))
+	FGameplayTag DefaultFinish;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentFinish)
 	FGameplayTag CurrentFinish;
@@ -50,6 +49,7 @@ private:
 	FGameplayTag UnitType;
 	
 public:
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	bool TryConsumeUnit(uint8 Quantity);
@@ -69,6 +69,7 @@ public:
 	// getter for current finish so that it can be retrieved by paintables to apply desired finish onto it
 	FGameplayTag GetCurrentFinish() const {return CurrentFinish;}
 	
+	FGameplayTag GetUnitType() const {return UnitType;}
 	
 	// static helper to try and find units component of type, given an actor and a gameplay tag (that refers to `UnitType` property)
 	// used to retrieve separate units across multiple instances of UFlipperUsableUnitComponent on an actor

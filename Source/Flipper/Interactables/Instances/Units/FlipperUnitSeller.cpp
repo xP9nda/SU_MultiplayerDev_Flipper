@@ -30,9 +30,21 @@ void AFlipperUnitSeller::Interact_Implementation(AActor* Interactor)
 	// take the units before refunding, so that a failed unit removal doesn't give money
 	if (!SaleInfo.UnitsComponent->TryConsumeUnit(SaleInfo.UnitsToSell)) return;
 	
-	// refund the amount of money so that it's removed from the money that the player spent and doesn't contribute to money earned
-	// players would read "money earned" as the amount they've received from gameplay actions, this just corrects their spending to remove the refunded value
-	FlipperGameState->RefundFunds(SaleInfo.TotalRefundValue, GetInteractorPlayerState(Interactor));
+	if (UnitsToEarn.HasTagExact(SaleInfo.UnitsComponent->GetUnitType()))
+	{
+		// if the unit type of the units component is marked explicitly as a money earner,
+		// don't refund and instead track the money as earned
+		// 
+		// this allows one unit seller to be sold to for everything,
+		// supporting refunding already purchased units, and units provided during gameplay (e.g. trash) 
+		FlipperGameState->AddFunds(SaleInfo.TotalRefundValue, GetInteractorPlayerState(Interactor));
+	}
+	else
+	{
+		// refund the amount of money so that it's removed from the money that the player spent and doesn't contribute to money earned
+		// players would read "money earned" as the amount they've received from gameplay actions, this just corrects their spending to remove the refunded value
+		FlipperGameState->RefundFunds(SaleInfo.TotalRefundValue, GetInteractorPlayerState(Interactor));
+	}
 }
 
 FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)

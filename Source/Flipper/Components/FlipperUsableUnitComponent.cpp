@@ -13,18 +13,6 @@ UFlipperUsableUnitComponent::UFlipperUsableUnitComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
-	
-	// ...
-}
-
-
-// Called when the game starts
-void UFlipperUsableUnitComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
 }
 
 void UFlipperUsableUnitComponent::OnRep_UsableUnits() const
@@ -57,6 +45,16 @@ bool UFlipperUsableUnitComponent::TryAddUnit(uint8 Quantity)
 	UsableUnits += Quantity;
 	OnRep_UsableUnits();
 	return true;
+}
+
+void UFlipperUsableUnitComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (DefaultFinish.IsValid())
+	{
+		CurrentFinish = DefaultFinish;
+	}
 }
 
 void UFlipperUsableUnitComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
