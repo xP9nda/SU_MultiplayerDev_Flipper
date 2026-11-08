@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "FlipperInteractCooldownWidget.generated.h"
+#include "FlipperInteractCrosshairWidget.generated.h"
 
 class UImage;
 class UFlipperInteractComponent;
@@ -12,11 +12,12 @@ class UFlipperInteractComponent;
  * 
  */
 UCLASS(Abstract)
-class FLIPPER_API UFlipperInteractCooldownWidget : public UUserWidget
+class FLIPPER_API UFlipperInteractCrosshairWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 protected:
+	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeDestruct() override;
@@ -30,11 +31,20 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> InteractProgressImage;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> CrosshairImage;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
 	TObjectPtr<UMaterialInstance> InteractProgressMaterial;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
 	FName MaterialFillProgressParameterName = FName("FillProgress");
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	FSlateBrush DefaultCrosshairBrush;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	FSlateBrush HoverCrosshairBrush;
 	
 private:
 	TWeakObjectPtr<UMaterialInstanceDynamic> InteractProgressMaterialDynamic;
@@ -45,6 +55,11 @@ private:
 	
 	UFUNCTION()
 	void HandleOnInteract();
-	void ObserveInteractComponent(UFlipperInteractComponent* NewComponent);
 	
+	UFUNCTION()
+	void HandleOnLookedAtActorChanged(AActor* LookedAtActor);
+	
+	void ObserveInteractComponent(UFlipperInteractComponent* NewComponent);
+
+protected:
 };

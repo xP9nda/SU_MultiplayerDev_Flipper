@@ -19,6 +19,7 @@ public class Flipper : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
+			"SlateCore",
 			"GameplayTags",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils"
