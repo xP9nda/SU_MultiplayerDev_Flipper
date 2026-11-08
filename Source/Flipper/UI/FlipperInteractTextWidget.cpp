@@ -15,9 +15,7 @@ void UFlipperInteractTextWidget::NativeConstruct()
 	if (!OwningController) return;
 	
 	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperInteractTextWidget::HandlePossessedPawnChanged);
-	
-	const APawn* OwningPawn = OwningController->GetPawn();
-	ObserveComponent(OwningPawn ? OwningPawn->FindComponentByClass<UFlipperInteractComponent>() : nullptr);
+	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
 }
 
 void UFlipperInteractTextWidget::NativeDestruct()

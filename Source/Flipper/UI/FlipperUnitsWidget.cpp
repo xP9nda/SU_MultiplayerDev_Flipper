@@ -33,14 +33,7 @@ void UFlipperUnitsWidget::NativeConstruct()
 	
 	// bind to a new pawn, so that if the character is slow to spawn in, the component delegate bindings are still set up
 	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperUnitsWidget::HandlePossessedPawnChanged);
-	
-	APawn* OwningPawn = OwningController->GetPawn();
-	if (!OwningPawn) return;
-	
-	UFlipperToolComponent* ToolComponent = OwningPawn->GetComponentByClass<UFlipperToolComponent>();
-	if (!ToolComponent) return;
-	
-	ObserveToolComponent(ToolComponent);
+	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
 }
 
 void UFlipperUnitsWidget::NativePreConstruct()

@@ -127,10 +127,7 @@ void UFlipperInteractComponent::Server_AttemptInteraction_Implementation()
 	
 	AllowedInteractionTime = CurrentTime + (InteractionCooldown * 0.9f); // allow for a bit of network jitter
 	
-	// do interaction this way to avoid a null pointer on the cast, in case the hit actor doesn't implement interaction
-	// send through this component's owner from the server as the user who interacted
+	OnInteract.Broadcast();
 	IFlipperInteract::Execute_Interact(Hit.GetActor(), GetOwner()); 
-	
-	// Cast<IFlipperInteract>(Hit.GetActor())->Execute_Interact(Hit.GetActor()); // cast to interact interface to perform interact method
 }
 

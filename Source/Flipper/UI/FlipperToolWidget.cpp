@@ -26,9 +26,7 @@ void UFlipperToolWidget::NativeConstruct()
 	if (!OwningController) return;
 	
 	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperToolWidget::HandlePossessedPawnChanged);
-	
-	const APawn* OwningPawn = OwningController->GetPawn();
-	ObserveComponent(OwningPawn ? OwningPawn->FindComponentByClass<UFlipperToolComponent>() : nullptr);
+	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
 }
 
 void UFlipperToolWidget::NativeDestruct()
