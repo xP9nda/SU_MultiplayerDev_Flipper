@@ -47,9 +47,20 @@ protected:
 	TObjectPtr<UTextBlock> CurrentToolDisplayNameText;
 	
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UProgressBar> UnitsProgressBar;
+	TObjectPtr<UImage> UnitsProgressImage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	TObjectPtr<UMaterialInstance> UnitsProgressMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	FName MaterialFillProgressParameterName = FName("Fill amount");
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	FName MaterialColourParameterName = FName("Liquid Color");
 	
 private:
+	TWeakObjectPtr<UMaterialInstanceDynamic> UnitsProgressMaterialDynamic;
+	
 	void ObserveUnitsComponent(UFlipperUsableUnitComponent* NewComponent);
 	void ObserveToolComponent(UFlipperToolComponent* NewComponent);
 	

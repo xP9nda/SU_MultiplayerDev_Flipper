@@ -5,6 +5,7 @@
 
 #include "Components/FlipperToolComponent.h"
 #include "Components/FlipperUsableUnitComponent.h"
+#include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/FlipperGameInstance.h"
@@ -12,6 +13,20 @@
 void UFlipperUnitsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
+	if (UnitsProgressMaterial)
+	{
+		UnitsProgressMaterialDynamic = UMaterialInstanceDynamic::Create(UnitsProgressMaterial, this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UnitsProgressMaterial is null on: %s"), *this->GetName());
+	}
+	
+	if (UnitsProgressMaterialDynamic.IsValid() && UnitsProgressImage)
+	{
+		UnitsProgressImage->SetBrushFromMaterial(UnitsProgressMaterialDynamic.Get());
+	}
 	
 	AController* OwningController = GetOwningPlayer();
 	if (!OwningController) return;
@@ -118,7 +133,11 @@ void UFlipperUnitsWidget::ClearDisplay()
 	CurrentUnitsAvailableText->SetText(FText::FromString("-"));
 	MaxUnitsAvailableText->SetText(FText::FromString("-"));
 	CurrentFinishDisplayNameText->SetText(FText::FromString("-"));
-	UnitsProgressBar->SetPercent(0.0f);
+	
+	if (UnitsProgressMaterialDynamic.Get())
+	{
+		UnitsProgressMaterialDynamic.Get()->SetScalarParameterValue(MaterialFillProgressParameterName, 0.0f);
+	}
 }
 
 void UFlipperUnitsWidget::UpdateDisplay()
@@ -135,7 +154,11 @@ void UFlipperUnitsWidget::UpdateDisplay()
 	
 	// update the progress bar
 	// avoid the div by 0 by setting it manually if any unit values are 0
-	UnitsProgressBar->SetPercent(CurrentUnits == 0 || MaxUsableUnits == 0 ? 0.0f : static_cast<float>(CurrentUnits) / static_cast<float>(MaxUsableUnits));
+	float FillPercent = CurrentUnits == 0 || MaxUsableUnits == 0 ? 0.0f : static_cast<float>(CurrentUnits) / static_cast<float>(MaxUsableUnits);
+	if (UnitsProgressMaterialDynamic.Get())
+	{
+		UnitsProgressMaterialDynamic.Get()->SetScalarParameterValue(MaterialFillProgressParameterName, FillPercent);
+	}
 	
 	const UFlipperGameInstance* GameInstance = Cast<UFlipperGameInstance>(GetWorld()->GetGameInstance());
 	if (!GameInstance) return;
@@ -153,7 +176,10 @@ void UFlipperUnitsWidget::UpdateDisplay()
 	if (FinishData)
 	{
 		CurrentFinishDisplayNameText->SetText(CurrentUnits == 0 ? FText::FromString("-") : FinishData->DisplayName);
-		UnitsProgressBar->SetFillColorAndOpacity(FinishData->SurfaceColour);
+		if (UnitsProgressMaterialDynamic.Get())
+		{
+			UnitsProgressMaterialDynamic.Get()->SetVectorParameterValue(MaterialColourParameterName, FinishData->SurfaceColour);
+		}
 	} else
 	{
 		CurrentFinishDisplayNameText->SetText(FText::FromString("-"));
