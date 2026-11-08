@@ -94,6 +94,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
 	UInputAction* ToolbarTool3Action;
 	
+	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
+	UInputAction* ToolbarTool4Action;
+	
 public:
 	AFlipperCharacter();
 
@@ -135,6 +138,9 @@ protected:
 	
 	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
 	virtual void DoToolbarTool3();
+	
+	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
+	virtual void DoToolbarTool4();
 	
 	UFUNCTION()
 	void HandleToolChanged(FGameplayTag NewTool);

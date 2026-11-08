@@ -103,6 +103,7 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(ToolbarTool1Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool1);
 		EnhancedInputComponent->BindAction(ToolbarTool2Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool2);
 		EnhancedInputComponent->BindAction(ToolbarTool3Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool3);
+		EnhancedInputComponent->BindAction(ToolbarTool4Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool4);
 	}
 	else
 	{
@@ -191,6 +192,12 @@ void AFlipperCharacter::DoToolbarTool3()
 {
 	if (!ToolComponent) return;
 	ToolComponent->SetToolIndex(2);
+}
+
+void AFlipperCharacter::DoToolbarTool4()
+{
+	if (!ToolComponent) return;
+	ToolComponent->SetToolIndex(3);
 }
 
 void AFlipperCharacter::HandleToolChanged(FGameplayTag NewTool)
