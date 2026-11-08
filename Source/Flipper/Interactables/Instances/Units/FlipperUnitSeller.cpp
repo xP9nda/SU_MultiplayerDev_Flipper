@@ -27,6 +27,9 @@ void AFlipperUnitSeller::Interact_Implementation(AActor* Interactor)
 	FFlipperSaleInformation SaleInfo;
 	if (!TryGetSaleInformation(Interactor, SaleInfo)) return;
 	
+	// if the unit seller does not allow selling of the unit type that the player has equipped, don't allow selling
+	if (!AllowedSellableUnits.HasTagExact(SaleInfo.UnitsComponent->GetUnitType())) return;
+	
 	// take the units before refunding, so that a failed unit removal doesn't give money
 	if (!SaleInfo.UnitsComponent->TryConsumeUnit(SaleInfo.UnitsToSell)) return;
 	
@@ -50,17 +53,24 @@ void AFlipperUnitSeller::Interact_Implementation(AActor* Interactor)
 FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)
 {
 	FFlipperInteractText NewInteractText = FFlipperInteractText();
+	NewInteractText.MainText = FText::FromString("Sell Units");
+	
+	UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
+	const UFlipperToolComponent* InteractorToolComponent = Interactor->FindComponentByClass<UFlipperToolComponent>();
+	const FText ToolDisplayName = FlipperGameInstance->ToolNames.Find(InteractorToolComponent->GetCurrentTool()) ? FlipperGameInstance->ToolNames.Find(InteractorToolComponent->GetCurrentTool())->ToLower() : FText::FromString("your current tool's");
+	
+	// if the player is attempting to sell units that cannot be sold here
+	if (!AllowedSellableUnits.HasTagExact(InteractorToolComponent->GetCurrentTool()))
+	{
+		NewInteractText.DescriptionText = FText::Format(FText::FromString("You cannot sell {0} units here"), ToolDisplayName);
+		return NewInteractText;
+	}
 	
 	FFlipperSaleInformation SaleInfo;
 	if (!TryGetSaleInformation(Interactor, SaleInfo))
 	{
-		NewInteractText.MainText = FText::FromString("Sell Units");
-		
-		UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
-		UFlipperToolComponent* InteractorToolComponent = Interactor->FindComponentByClass<UFlipperToolComponent>();
 		if (InteractorToolComponent)
 		{
-			FText ToolDisplayName = FlipperGameInstance->ToolNames.Find(InteractorToolComponent->GetCurrentTool())->ToLower();
 			NewInteractText.DescriptionText = FText::Format(FText::FromString("Your {0} is empty"), ToolDisplayName);
 		}
 		else
@@ -72,7 +82,7 @@ FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)
 	}
 	
 	NewInteractText.MainText = FText::Format(
-		FText::FromString("Sell {0} Units of {1}"), 
+		FText::FromString("Sell {0} {0}|plural(one=Unit,other=Units) of {1}"), 
 		SaleInfo.UnitsToSell,
 		SaleInfo.HeldSurfaceFinish->DisplayName
 	);
@@ -80,11 +90,21 @@ FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)
 	FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US")); // strip the "US" from "US$x.xx"
 	FText FormattedTotalRefundValue = FText::AsCurrencyBase(SaleInfo.TotalRefundValue, TEXT("USD"), USCulture);
 	
-	NewInteractText.DescriptionText = FText::Format(
-		FText::FromString("{0} sell value ({1}% of original cost)"), 
-		FormattedTotalRefundValue,
-		SellPercentage * 100
-	);
+	if (bShouldShowSellPercentage)
+	{
+		NewInteractText.DescriptionText = FText::Format(
+			FText::FromString("{0} sell value ({1}% of original cost)"), 
+			FormattedTotalRefundValue,
+			SellPercentage * 100
+		);
+	}
+	else
+	{
+		NewInteractText.DescriptionText = FText::Format(
+			FText::FromString("{0} sell value"), 
+			FormattedTotalRefundValue
+		);
+	}
 	
 	return NewInteractText;
 }
@@ -92,7 +112,7 @@ FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)
 bool AFlipperUnitSeller::TryGetSaleInformation(AActor* Interactor, FFlipperSaleInformation& SaleInfo) const
 {
 	// get the tool component and usable unit component manually rather than through the inherited helper,
-	// as this sell point supports all unit types, driven by the tool the user currently has equipped
+	// as this sell point supports all unit types, it's driven by the tool the user currently has equipped
 	const UFlipperToolComponent* ToolComponent = Interactor ? Interactor->FindComponentByClass<UFlipperToolComponent>() : nullptr;
 	if (!ToolComponent) return false;
 	

@@ -36,6 +36,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", meta = (Categories = "Units"))
 	FGameplayTagContainer UnitsToEarn;
 	
+	// units that are allowed to be sold at this unit seller
+	UPROPERTY(EditAnywhere, Category = "Flipper|Economy", meta = (Categories = "Units"))
+	FGameplayTagContainer AllowedSellableUnits;
+	
+	// whether the UI interaction text should show the sell percentage after the total value
+	UPROPERTY(EditAnywhere, Category = "Flipper|UI", meta = (Categories = "Units"))
+	bool bShouldShowSellPercentage;
+	
 	bool TryGetSaleInformation(AActor* Interactor, FFlipperSaleInformation& SaleInfo) const;
 	
 };
