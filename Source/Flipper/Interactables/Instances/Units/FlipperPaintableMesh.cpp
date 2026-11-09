@@ -4,6 +4,7 @@
 #include "FlipperPaintableMesh.h"
 
 #include "Components/FlipperUsableUnitComponent.h"
+#include "Core/FlipperPlayerState.h"
 #include "DataAssets/FlipperSurfaceFinishData.h"
 #include "Net/UnrealNetwork.h"
 
@@ -108,6 +109,11 @@ void AFlipperPaintableMesh::OnRep_PaintState()
 	}
 }
 
+bool AFlipperPaintableMesh::IsCompleteAndCorrect() const
+{
+	return (CurrentPaintableStep == MaxPaintableSteps) && (CurrentFinish.MatchesTagExact(TargetFinish));
+}
+
 void AFlipperPaintableMesh::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -118,6 +124,7 @@ void AFlipperPaintableMesh::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 {
 	if (!HasAuthority()) return;
+	if (IsCompleteAndCorrect()) return; // don't allow re-painting once the wall is complete and correct
 	
 	// get the units component for the relevant unit type
 	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
@@ -135,7 +142,15 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 	if (!SurfaceData) return;
 	
 	// the held paint decides what this wall becomes, e.g. red paint on a wall that wants red brick becomes red brick
-	CurrentFinish = SurfaceData->ResolveAppliedFinish(HeldFinish, TargetFinish);
+	const FGameplayTag NewFinish = SurfaceData->ResolveAppliedFinish(HeldFinish, TargetFinish);
+	
+	// if the new finish differs from the current finish and the steps are above 0, reset paint progress
+	if (!NewFinish.MatchesTagExact(CurrentFinish) && CurrentPaintableStep > 0)
+	{
+		CurrentPaintableStep = 0;
+	}
+	
+	CurrentFinish = NewFinish;
 	
 	// check the current paintable step AND unit consume at once,
 	// so that a completed wall can still be re-finished, but an incomplete wall will use a unit and advance progress
@@ -144,6 +159,22 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 	if (CurrentPaintableStep < MaxPaintableSteps && UnitsComponent->TryConsumeUnit(1))
 	{
 		CurrentPaintableStep++;
+		
+		// only if a unit was taken, track contribution
+		AFlipperPlayerState* InteractorPlayerState = GetInteractorPlayerState(Interactor);
+		if (InteractorPlayerState)
+		{
+			if (CurrentFinish.MatchesTagExact(TargetFinish))
+			{
+				StepsPerPlayer.FindOrAdd(InteractorPlayerState).CorrectSteps++; // increment the CORRECT steps that this interactor has contributed to the wall
+				InteractorPlayerState->AddSurfaceContribution(EFlipperContributionType::Correct);
+			}
+			else
+			{
+				StepsPerPlayer.FindOrAdd(InteractorPlayerState).IncorrectSteps++; // increment the INCORRECT steps that this interactor has contributed to the wall 
+				InteractorPlayerState->AddSurfaceContribution(EFlipperContributionType::Incorrect);
+			}
+		}
 	}
 	
 	OnRep_PaintState(); // listen server host update
@@ -152,6 +183,13 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 FFlipperInteractText AFlipperPaintableMesh::GetInteractText(AActor* Interactor)
 {
 	FFlipperInteractText NewInteractText = FFlipperInteractText();
+	
+	if (IsCompleteAndCorrect())
+	{
+		NewInteractText.MainText = FText::FromString("Surface Finished");
+		NewInteractText.DescriptionText = FText::FromString("100% done, with correct type"); // can presume 100% done rather than work it out mathematically
+		return NewInteractText;
+	}
 	
 	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
 	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);

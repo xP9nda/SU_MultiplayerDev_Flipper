@@ -3,13 +3,28 @@
 
 #include "FlipperPlayerState.h"
 
+#include "FFlipperStepsContribution.h"
 #include "Net/UnrealNetwork.h"
 
-void AFlipperPlayerState::AddSurfaceCompleted()
+
+void AFlipperPlayerState::AddSurfaceContribution(const EFlipperContributionType ContributionType)
 {
 	if (!HasAuthority()) return;
 	
-	SurfacesCompleted++;
+	switch (ContributionType)
+	{
+		case EFlipperContributionType::Correct:
+			SurfaceContribution.CorrectSteps++;
+			break;
+		
+		case EFlipperContributionType::Incorrect:
+			SurfaceContribution.IncorrectSteps++;
+			break;
+		
+		default:
+			break;
+	}
+	
 	OnRep_ContributionChanged();
 }
 
@@ -45,7 +60,7 @@ void AFlipperPlayerState::RemoveFundsSpent(int32 Amount)
 void AFlipperPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AFlipperPlayerState, SurfacesCompleted);
+	DOREPLIFETIME(AFlipperPlayerState, SurfaceContribution);
 	DOREPLIFETIME(AFlipperPlayerState, FundsEarned);
 	DOREPLIFETIME(AFlipperPlayerState, FundsSpent);
 }

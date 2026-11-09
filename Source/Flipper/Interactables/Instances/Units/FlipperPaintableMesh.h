@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/FFlipperStepsContribution.h"
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperPaintableMesh.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPaintableMeshCompleted, AFlipperPaintableMesh*, Mesh, APawn*, FinishedBy);
 
 UCLASS()
 class FLIPPER_API AFlipperPaintableMesh : public AFlipperUnitsBaseInteractable
@@ -64,10 +67,18 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_PaintState)
 	FGameplayTag CurrentFinish;
 	
+	// the number of steps completed per player to track contributions
+	TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepsContribution> StepsPerPlayer;
+	
 	UFUNCTION()
 	void OnRep_PaintState();
 	
 public:
+	
+	FOnPaintableMeshCompleted OnPaintableMeshCompleted;
+	
+	bool IsCompleteAndCorrect() const;
+	const TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepsContribution>& GetStepsPerPlayer() const { return StepsPerPlayer; }
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;

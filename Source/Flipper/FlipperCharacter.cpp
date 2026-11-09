@@ -255,10 +255,12 @@ void AFlipperCharacter::Tick(float DeltaTime)
 		AFlipperPlayerState* FlipperPlayerState = GetPlayerState<AFlipperPlayerState>();
 		if (!FlipperPlayerState) return;
 		
+		const FFlipperStepsContribution& PlayerSurfaceContribution = FlipperPlayerState->GetSurfaceContribution();
+		
 		const uint64 Key = (uint64)GetUniqueID();
 		const FString Line = FString::Printf(
-			TEXT("%s | FUNDS EARNED: %d | FUNDS SPENT: %d | SURFACES COMPLETED: %d"),
-			*GetName(), FlipperPlayerState->GetFundsEarned(), FlipperPlayerState->GetFundsSpent(), FlipperPlayerState->GetSurfacesCompleted());
+			TEXT("%s | FUNDS EARNED: %d | FUNDS SPENT: %d | SURFACE CONTRIBUTION: (%d correct / %d incorrect)"),
+			*GetName(), FlipperPlayerState->GetFundsEarned(), FlipperPlayerState->GetFundsSpent(), PlayerSurfaceContribution.CorrectSteps, PlayerSurfaceContribution.IncorrectSteps);
 
 		GEngine->AddOnScreenDebugMessage(Key, 2.0f, FColor::Green, Line);
 	}

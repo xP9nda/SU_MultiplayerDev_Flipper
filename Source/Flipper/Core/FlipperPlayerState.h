@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FFlipperStepsContribution.h"
 #include "GameFramework/PlayerState.h"
 #include "FlipperPlayerState.generated.h"
 
@@ -15,12 +16,12 @@ class FLIPPER_API AFlipperPlayerState : public APlayerState
 	
 public:
 	// server only through auth guard
-	void AddSurfaceCompleted();
+	void AddSurfaceContribution(const EFlipperContributionType ContributionType);
 	void AddFundsEarned(int32 Amount);
 	void AddFundsSpent(int32 Amount);
 	void RemoveFundsSpent(int32 Amount);
 	
-	int32 GetSurfacesCompleted() const { return SurfacesCompleted; }
+	const FFlipperStepsContribution& GetSurfaceContribution() const { return SurfaceContribution; }
 	int32 GetFundsEarned() const { return FundsEarned; }
 	int32 GetFundsSpent() const { return FundsSpent; }
 	
@@ -30,7 +31,7 @@ public:
 private:
 	// use the same OnRep function as the scoreboard only needs to know "something changed"
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
-	int32 SurfacesCompleted = 0;
+	FFlipperStepsContribution SurfaceContribution;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
 	int32 FundsEarned = 0;
