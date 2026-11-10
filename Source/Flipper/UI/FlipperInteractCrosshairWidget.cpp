@@ -55,7 +55,7 @@ void UFlipperInteractCrosshairWidget::NativeTick(const FGeometry& MyGeometry, fl
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	const double TimeRemaining = AnimationEndTime - CurrentTime;
 	
-	// start at 0 progress -> 1 when it ends
+	// start at 1 progress -> 0 when it ends so the ring ticks down from full to empty, implying a cooldown rather than a filling progress meter (or time for interact to happen)
 	const float Progress = FMath::Clamp( (TimeRemaining / AnimationDuration), 0.0f, 1.0f);
 	InteractProgressMaterialDynamic->SetScalarParameterValue(MaterialFillProgressParameterName, Progress);
 	
@@ -88,6 +88,8 @@ void UFlipperInteractCrosshairWidget::HandlePossessedPawnChanged(APawn* OldPawn,
 
 void UFlipperInteractCrosshairWidget::HandleOnInteract()
 {
+	if (!IsValid(ObservedInteractComponent)) return;
+	
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	AnimationDuration = ObservedInteractComponent->InteractionCooldown;
 	AnimationEndTime = CurrentTime + AnimationDuration;

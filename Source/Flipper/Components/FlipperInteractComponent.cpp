@@ -109,6 +109,9 @@ void UFlipperInteractComponent::AttemptInteract()
 	if (!Hit.GetActor()->Implements<UFlipperInteract>()) return; // if hit actor doesn't implement interact
 	
 	LocalAllowedInteractionTime = CurrentTime + InteractionCooldown;
+	
+	// call OnInteract in the client's interact so that the widget shows interaction cooldown locally
+	OnInteract.Broadcast();
 	Server_AttemptInteraction();
 }
 
@@ -127,7 +130,6 @@ void UFlipperInteractComponent::Server_AttemptInteraction_Implementation()
 	
 	AllowedInteractionTime = CurrentTime + (InteractionCooldown * 0.9f); // allow for a bit of network jitter
 	
-	OnInteract.Broadcast();
 	IFlipperInteract::Execute_Interact(Hit.GetActor(), GetOwner()); 
 }
 
