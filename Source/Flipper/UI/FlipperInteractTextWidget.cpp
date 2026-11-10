@@ -69,8 +69,8 @@ void UFlipperInteractTextWidget::HandleLookedAtActorChanged(AActor* NewLookedAtA
 {
 	LookedAtActor = NewLookedAtActor;
 	RefreshInteractText();
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (!World) return;
 	
 	// keep refreshing while we are looking at something. while not looking at anything, clear the timer handle
@@ -93,8 +93,8 @@ void UFlipperInteractTextWidget::RefreshInteractText()
 		SetWidgetVisibility(false);
 		return;
 	}
-	
-	FFlipperInteractText InteractText = Interact->GetInteractText(ObservedComponent->GetOwner());
+
+	const FFlipperInteractText InteractText = Interact->GetInteractText(ObservedComponent->GetOwner());
 	
 	// if both values are empty hide the widget
 	if (InteractText.MainText.IsEmpty() && InteractText.DescriptionText.IsEmpty())

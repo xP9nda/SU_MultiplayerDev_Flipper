@@ -100,7 +100,7 @@ FHitResult UFlipperInteractComponent::PerformLinetrace() // todo - document
 void UFlipperInteractComponent::AttemptInteract()
 {
 	// check if the client is within interaction cooldown; prevent unnecessary calls to server
-	double CurrentTime = GetWorld()->GetTimeSeconds();
+	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime < LocalAllowedInteractionTime) return;
 	
 	const FHitResult Hit = PerformLinetrace();
@@ -119,7 +119,7 @@ void UFlipperInteractComponent::AttemptInteract()
 void UFlipperInteractComponent::Server_AttemptInteraction_Implementation()
 {
 	// check whether the interaction is allowed right now
-	double CurrentTime = GetWorld()->GetTimeSeconds();
+	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime < AllowedInteractionTime) return; // don't allow the interaction, it's too soon
 	
 	// re-validate the linetrace on the server to ensure client isn't lying

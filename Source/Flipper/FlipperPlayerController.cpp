@@ -25,8 +25,8 @@ AFlipperPlayerController::AFlipperPlayerController()
 void AFlipperPlayerController::Server_Cheat_AddFunds_Implementation(int32 Amount)
 {
 #if !UE_BUILD_SHIPPING
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (!World) return;
 	
 	AGameModeBase* AuthGameMode = World->GetAuthGameMode();
@@ -78,7 +78,7 @@ void AFlipperPlayerController::SetupInputComponent()
 		// Add Input Mapping Context
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
-			for (UInputMappingContext* CurrentContext : DefaultMappingContexts)
+			for (const UInputMappingContext* CurrentContext : DefaultMappingContexts)
 			{
 				Subsystem->AddMappingContext(CurrentContext, 0);
 			}
@@ -86,7 +86,7 @@ void AFlipperPlayerController::SetupInputComponent()
 			// only add these IMCs if we're not using mobile touch input
 			if (!ShouldUseTouchControls())
 			{
-				for (UInputMappingContext* CurrentContext : MobileExcludedMappingContexts)
+				for (const UInputMappingContext* CurrentContext : MobileExcludedMappingContexts)
 				{
 					Subsystem->AddMappingContext(CurrentContext, 0);
 				}

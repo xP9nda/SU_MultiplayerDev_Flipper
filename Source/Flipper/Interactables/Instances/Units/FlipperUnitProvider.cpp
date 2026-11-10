@@ -133,7 +133,7 @@ FFlipperInteractText AFlipperUnitProvider::GetInteractText(AActor* Interactor)
 	// get the tool name from the game instance
 	UFlipperGameInstance* FlipperGameInstance = GetFlipperGameInstance();
 	const FText* FoundToolName = FlipperGameInstance ? FlipperGameInstance->ToolNames.Find(UnitType) : nullptr;
-	FText ToolDisplayName = FoundToolName ? FoundToolName->ToLower() : FText::FromString("tool"); // fallback to a generic name if gameinstance or foundtoolname is invalid
+	const FText ToolDisplayName = FoundToolName ? FoundToolName->ToLower() : FText::FromString("tool"); // fallback to a generic name if gameinstance or foundtoolname is invalid
 	
 	switch (PurchaseResult)
 	{
@@ -162,7 +162,7 @@ FFlipperInteractText AFlipperUnitProvider::GetInteractText(AActor* Interactor)
 		
 		case EFlipperPurchaseResult::Success:
 		{
-			FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US"));
+			const FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US"));
 			const FText FormattedTotalCost = FText::AsCurrencyBase(PurchaseInfo.TotalCost, TEXT("USD"), USCulture);
 			const int32 UnitsToPurchase = PurchaseInfo.UnitsToPurchase;
 			

@@ -115,7 +115,7 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void AFlipperCharacter::MoveInput(const FInputActionValue& Value)
 {
 	// get the Vector2D move axis
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	// pass the axis values to the move input
 	DoMove(MovementVector.X, MovementVector.Y);
@@ -125,7 +125,7 @@ void AFlipperCharacter::MoveInput(const FInputActionValue& Value)
 void AFlipperCharacter::LookInput(const FInputActionValue& Value)
 {
 	// get the Vector2D look axis
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	// pass the axis values to the aim input
 	DoAim(LookAxisVector.X, LookAxisVector.Y);
@@ -252,7 +252,7 @@ void AFlipperCharacter::Tick(float DeltaTime)
 	// player state debugging
 	if (FlipperCheatManager->IsPlayerStateDebuggingEnabled())
 	{
-		AFlipperPlayerState* FlipperPlayerState = GetPlayerState<AFlipperPlayerState>();
+		const AFlipperPlayerState* FlipperPlayerState = GetPlayerState<AFlipperPlayerState>();
 		if (!FlipperPlayerState) return;
 		
 		const FFlipperStepsContribution& PlayerSurfaceContribution = FlipperPlayerState->GetSurfaceContribution();

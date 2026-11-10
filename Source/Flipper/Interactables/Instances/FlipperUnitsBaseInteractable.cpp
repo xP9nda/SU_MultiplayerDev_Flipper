@@ -37,7 +37,7 @@ UFlipperUsableUnitComponent* AFlipperUnitsBaseInteractable::GetActiveUnitsCompon
 
 AFlipperGameState* AFlipperUnitsBaseInteractable::GetFlipperGameState() const
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (!World) return nullptr;
 	
 	return World->GetGameState<AFlipperGameState>();
@@ -64,7 +64,7 @@ const UFlipperSurfaceFinishData* AFlipperUnitsBaseInteractable::GetSurfaceData()
 
 UFlipperGameInstance* AFlipperUnitsBaseInteractable::GetFlipperGameInstance() const
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (!World) return nullptr;
 	
 	UFlipperGameInstance* GameInstance = World->GetGameInstance<UFlipperGameInstance>();

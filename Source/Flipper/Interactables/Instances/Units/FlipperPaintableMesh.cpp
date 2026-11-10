@@ -197,7 +197,7 @@ FFlipperInteractText AFlipperPaintableMesh::GetInteractText(AActor* Interactor)
 	}
 	
 	const UFlipperSurfaceFinishData* SurfaceData = GetSurfaceData();
-	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
+	const UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!SurfaceData || !UnitsComponent)
 	{
 		// if there's an error getting information about surface data or the units, show a generic message

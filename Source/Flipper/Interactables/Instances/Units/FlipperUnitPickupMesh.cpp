@@ -44,8 +44,8 @@ void AFlipperUnitPickupMesh::Interact_Implementation(AActor* Interactor)
 FFlipperInteractText AFlipperUnitPickupMesh::GetInteractText(AActor* Interactor)
 {
 	FFlipperInteractText NewInteractText;
-	
-	UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
+
+	const UFlipperUsableUnitComponent* UnitsComponent = GetActiveUnitsComponent(Interactor);
 	if (!UnitsComponent)
 	{
 		// if there's an error getting information about surface data or the units, show a generic message

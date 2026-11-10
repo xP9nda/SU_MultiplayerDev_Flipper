@@ -147,7 +147,7 @@ void UFlipperUnitsWidget::UpdateDisplay()
 	
 	// update the progress bar
 	// avoid the div by 0 by setting it manually if any unit values are 0
-	float FillPercent = CurrentUnits == 0 || MaxUsableUnits == 0 ? 0.0f : static_cast<float>(CurrentUnits) / static_cast<float>(MaxUsableUnits);
+	const float FillPercent = CurrentUnits == 0 || MaxUsableUnits == 0 ? 0.0f : static_cast<float>(CurrentUnits) / static_cast<float>(MaxUsableUnits);
 	if (UnitsProgressMaterialDynamic.Get())
 	{
 		UnitsProgressMaterialDynamic.Get()->SetScalarParameterValue(MaterialFillProgressParameterName, FillPercent);

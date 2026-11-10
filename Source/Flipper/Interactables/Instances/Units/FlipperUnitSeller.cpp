@@ -86,9 +86,9 @@ FFlipperInteractText AFlipperUnitSeller::GetInteractText(AActor* Interactor)
 		SaleInfo.UnitsToSell,
 		SaleInfo.HeldSurfaceFinish->DisplayName
 	);
-	
-	FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US")); // strip the "US" from "US$x.xx"
-	FText FormattedTotalRefundValue = FText::AsCurrencyBase(SaleInfo.TotalRefundValue, TEXT("USD"), USCulture);
+
+	const FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US")); // strip the "US" from "US$x.xx"
+	const FText FormattedTotalRefundValue = FText::AsCurrencyBase(SaleInfo.TotalRefundValue, TEXT("USD"), USCulture);
 	
 	if (bShouldShowSellPercentage)
 	{

@@ -23,8 +23,8 @@ void AFlipperGameMode::HandleJobSiteCompleted(const AFlipperJobSite* JobSite) co
 {
 	if (!JobSite) return;
 	if (JobSite->GetJobState() != EFlipperJobState::Completed) return;
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (!World) return;
 	
 	AFlipperGameState* GS = World->GetGameState<AFlipperGameState>();
@@ -36,8 +36,8 @@ void AFlipperGameMode::HandleJobSiteCompleted(const AFlipperJobSite* JobSite) co
 void AFlipperGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (!World) return;
 	
 	AFlipperGameState* GS = World->GetGameState<AFlipperGameState>();

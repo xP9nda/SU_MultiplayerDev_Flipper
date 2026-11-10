@@ -9,8 +9,8 @@
 void UFlipperTeamFundsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (!World) return;
 	
 	AFlipperGameState* GameState = GetWorld()->GetGameState<AFlipperGameState>();

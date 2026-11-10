@@ -130,8 +130,8 @@ void AFlipperJobSite::HandlePickupMeshCompleted(AFlipperUnitPickupMesh* Mesh, AP
 void AFlipperJobSite::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	bool bHasAuthority = HasAuthority();
+
+	const bool bHasAuthority = HasAuthority();
 	
 	// only register the delegates for when things are completed on the server,
 	// but track the number of paintables and pickups on all clients, so that
