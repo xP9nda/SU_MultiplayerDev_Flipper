@@ -25,8 +25,9 @@ void AFlipperJobSite::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	
 	// these values will never be updated after they're set, so COND_InitialOnly "will only attempt to send on the initial bunch", i.e. initial client update
 	// the condition should be removed if these will ever be changed at runtime, but they won't, just making a note of it
-	DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPaintableMeshes, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPickupMeshes, COND_InitialOnly);
+	// DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPaintableMeshes, COND_InitialOnly);
+	// DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPickupMeshes, COND_InitialOnly);
+	// commented out as the values can instead be derived in beginplay on clients as well as the server
 }
 
 void AFlipperJobSite::Interact_Implementation(AActor* Interactor)
@@ -130,13 +131,16 @@ void AFlipperJobSite::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (!HasAuthority()) return;
-
+	bool bHasAuthority = HasAuthority();
+	
+	// only register the delegates for when things are completed on the server,
+	// but track the number of paintables and pickups on all clients, so that
+	// the values don't need to be replicated as they can be derived
 	for (TObjectPtr<AFlipperPaintableMesh> Mesh : PaintableMeshes)
 	{
 		if (!IsValid(Mesh)) continue;
 		
-		Mesh->OnPaintableMeshCompleted.AddUniqueDynamic(this, &AFlipperJobSite::HandlePaintableMeshCompleted);
+		if (bHasAuthority) Mesh->OnPaintableMeshCompleted.AddUniqueDynamic(this, &AFlipperJobSite::HandlePaintableMeshCompleted);
 		NumberPaintableMeshes++;
 	}
 
@@ -144,10 +148,12 @@ void AFlipperJobSite::BeginPlay()
 	{
 		if (!IsValid(Mesh)) continue;
 		
-		Mesh->OnPickupMeshCompleted.AddUniqueDynamic(this, &AFlipperJobSite::HandlePickupMeshCompleted);
+		if (bHasAuthority) Mesh->OnPickupMeshCompleted.AddUniqueDynamic(this, &AFlipperJobSite::HandlePickupMeshCompleted);
 		NumberPickupMeshes++;
 	}
 	
+	// register the job site only on the server
+	if (!bHasAuthority) return;
 	GetWorld()->GetAuthGameMode<AFlipperGameMode>()->RegisterJobSite(this);
 	
 }

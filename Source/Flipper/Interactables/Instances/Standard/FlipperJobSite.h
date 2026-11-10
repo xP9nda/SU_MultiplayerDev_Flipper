@@ -78,10 +78,7 @@ private:
 	UPROPERTY(Replicated)
 	FFlipperJobProgress JobProgress;
 	
-	UPROPERTY(Replicated)
 	int32 NumberPaintableMeshes = 0;
-	
-	UPROPERTY(Replicated)
 	int32 NumberPickupMeshes = 0;
 	
 	void SetJobState(EFlipperJobState NewJobState);
