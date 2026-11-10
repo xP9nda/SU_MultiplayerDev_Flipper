@@ -6,6 +6,8 @@
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperUnitPickupMesh.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPickupMeshCompleted, AFlipperUnitPickupMesh*, Mesh, APawn*, FinishedBy);
+
 UCLASS()
 class FLIPPER_API AFlipperUnitPickupMesh : public AFlipperUnitsBaseInteractable
 {
@@ -14,6 +16,8 @@ class FLIPPER_API AFlipperUnitPickupMesh : public AFlipperUnitsBaseInteractable
 public:
 	// Sets default values for this actor's properties
 	AFlipperUnitPickupMesh();
+	
+	FOnPickupMeshCompleted OnPickupMeshCompleted;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

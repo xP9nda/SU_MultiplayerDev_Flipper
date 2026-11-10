@@ -35,10 +35,8 @@ void UFlipperTeamFundsWidget::NativeDestruct()
 void UFlipperTeamFundsWidget::HandleTeamFundsChanged(int32 NewFunds)
 {
 	if (!IsValid(TeamFundsText)) return;
-		
-	FString CurrencyCode = TEXT("USD");
-	FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US")); // strip the "US" from "US$x.xx"
-	
-	FText FormattedFunds = FText::AsCurrencyBase(NewFunds, CurrencyCode, USCulture);
+
+	const FCulturePtr USCulture = FInternationalization::Get().GetCulture(TEXT("en-US")); // strip the "US" from "US$x.xx"
+	const FText FormattedFunds = FText::AsCurrencyBase(NewFunds, TEXT("USD"), USCulture);
 	TeamFundsText->SetText(FormattedFunds);
 }

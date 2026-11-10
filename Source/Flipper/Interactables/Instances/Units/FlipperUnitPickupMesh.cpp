@@ -36,6 +36,8 @@ void AFlipperUnitPickupMesh::Interact_Implementation(AActor* Interactor)
 	if (!UnitsComponent->TryAddUnit(UnitsToGive)) return;
 	
 	bIsPickedUp = true;
+	
+	OnPickupMeshCompleted.Broadcast(this, Cast<APawn>(Interactor));
 	OnRep_PickedUp();
 }
 
@@ -65,11 +67,11 @@ FFlipperInteractText AFlipperUnitPickupMesh::GetInteractText(AActor* Interactor)
 	const uint8 FreeSpace = UnitsComponent->GetMaxUsableUnits() - UnitsComponent->GetUsableUnits();
 	if (FreeSpace < UnitsToGive)
 	{
-		NewInteractText.DescriptionText = FText::Format(FText::FromString("Weight: {0} units (you don't have space)"), UnitsToGive);
+		NewInteractText.DescriptionText = FText::Format(FText::FromString("Weight: {0} {0}|plural(one=unit,other=units) (you don't have space)"), UnitsToGive);
 	}
 	else
 	{
-		NewInteractText.DescriptionText = FText::Format(FText::FromString("Weight: {0} units"), UnitsToGive);
+		NewInteractText.DescriptionText = FText::Format(FText::FromString("Weight: {0} {0}|plural(one=unit,other=units)"), UnitsToGive);
 	}
 	
 	return NewInteractText;

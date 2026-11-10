@@ -111,7 +111,7 @@ void AFlipperPaintableMesh::OnRep_PaintState()
 
 bool AFlipperPaintableMesh::IsCompleteAndCorrect() const
 {
-	return (CurrentPaintableStep == MaxPaintableSteps) && (CurrentFinish.MatchesTagExact(TargetFinish));
+	return (CurrentPaintableStep >= MaxPaintableSteps) && (CurrentFinish.MatchesTagExact(TargetFinish));
 }
 
 void AFlipperPaintableMesh::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -175,6 +175,11 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 				InteractorPlayerState->AddSurfaceContribution(EFlipperContributionType::Incorrect);
 			}
 		}
+	}
+	
+	if (IsCompleteAndCorrect())
+	{
+		OnPaintableMeshCompleted.Broadcast(this, Cast<APawn>(Interactor));
 	}
 	
 	OnRep_PaintState(); // listen server host update
