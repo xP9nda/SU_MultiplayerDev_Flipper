@@ -22,6 +22,11 @@ void AFlipperJobSite::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AFlipperJobSite, JobState);
 	DOREPLIFETIME(AFlipperJobSite, JobProgress);
+	
+	// these values will never be updated after they're set, so COND_InitialOnly "will only attempt to send on the initial bunch", i.e. initial client update
+	// the condition should be removed if these will ever be changed at runtime, but they won't, just making a note of it
+	DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPaintableMeshes, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(AFlipperJobSite, NumberPickupMeshes, COND_InitialOnly);
 }
 
 void AFlipperJobSite::Interact_Implementation(AActor* Interactor)
