@@ -10,16 +10,7 @@ AFlipperGameMode::AFlipperGameMode()
 	// stub
 }
 
-void AFlipperGameMode::RegisterJobSite(AFlipperJobSite* JobSite)
-{
-	if (!JobSite) return;
-	
-	JobSite->OnJobSiteCompleted.BindDynamic(this, &AFlipperGameMode::HandleJobSiteCompleted);
-	
-	JobSites.Add(JobSite);
-}
-
-void AFlipperGameMode::HandleJobSiteCompleted(const AFlipperJobSite* JobSite) const
+void AFlipperGameMode::HandleJobSiteCompleted(AFlipperJobSite* JobSite) const
 {
 	if (!JobSite) return;
 	if (JobSite->GetJobState() != EFlipperJobState::Completed) return;

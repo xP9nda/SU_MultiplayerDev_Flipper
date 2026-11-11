@@ -30,8 +30,9 @@ struct FFlipperJobProgress
 	uint8 CompletedPickupMeshes = 0;	
 };
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnJobSiteStateChanged, EFlipperJobState, JobState);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnJobSiteCompleted, const AFlipperJobSite*, JobSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnJobSiteStateChanged, AFlipperJobSite*, JobSite, EFlipperJobState, JobState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJobSiteCompleted, AFlipperJobSite*, JobSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJobSiteProgressChanged, const FFlipperJobProgress&, JobProgress);
 
 UCLASS()
 class FLIPPER_API AFlipperJobSite : public AFlipperBaseInteractable
@@ -45,9 +46,13 @@ public:
 	EFlipperJobState GetJobState() const { return JobState; }
 	FFlipperJobProgress GetJobProgress() const { return JobProgress; }
 	int32 GetCompletionPayout() const { return CompletionPayout; }
+	FText GetJobName() const { return JobName; }
+	int32 GetNumberPaintableMeshes() const { return NumberPaintableMeshes; }
+	int32 GetNumberPickupMeshes() const { return NumberPickupMeshes; }
 	
 	FOnJobSiteStateChanged OnJobSiteStateChanged;
 	FOnJobSiteCompleted OnJobSiteCompleted;
+	FOnJobSiteProgressChanged OnJobSiteProgressChanged;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -72,10 +77,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Flipper|Job", meta = (ClampMin = "0"))
 	int32 CompletionPayout = 100;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_JobState)
 	EFlipperJobState JobState = EFlipperJobState::NotStarted;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_JobProgress)
 	FFlipperJobProgress JobProgress;
 	
 	int32 NumberPaintableMeshes = 0;
@@ -85,6 +90,12 @@ private:
 	void UpdateCompletionStatus();
 	void SetInteractablesCanInteract(bool bNewCanInteract);
 
+	UFUNCTION()
+	void OnRep_JobState();
+	
+	UFUNCTION()
+	void OnRep_JobProgress();
+	
 	UFUNCTION()
 	void HandlePaintableMeshCompleted(AFlipperPaintableMesh* Mesh, APawn* FinishedBy);
 	UFUNCTION()

@@ -15,11 +15,9 @@ class AFlipperGameMode : public AGameMode
 
 public:
 	AFlipperGameMode();
-
-	void RegisterJobSite(AFlipperJobSite* JobSite);
 	
 	UFUNCTION()
-	void HandleJobSiteCompleted(const AFlipperJobSite* JobSite) const;
+	void HandleJobSiteCompleted(AFlipperJobSite* JobSite) const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -27,8 +25,6 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingMoney = 100;
-	
-	TArray<TWeakObjectPtr<AFlipperJobSite>> JobSites;
 };
 
 

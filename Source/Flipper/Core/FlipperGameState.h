@@ -6,9 +6,11 @@
 #include "GameFramework/GameState.h"
 #include "FlipperGameState.generated.h"
 
+class AFlipperJobSite;
 class AFlipperPlayerState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamFundsChanged, int32, NewFunds);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJobSiteRegistered, AFlipperJobSite*, JobSite);
 
 UCLASS()
 class FLIPPER_API AFlipperGameState : public AGameState
@@ -19,10 +21,13 @@ public:
 	void AddFunds(int32 Amount, AFlipperPlayerState* Earner = nullptr);
 	void RefundFunds(int32 Amount, AFlipperPlayerState* Spender = nullptr);
 	bool TrySpendFunds(int32 Amount, AFlipperPlayerState* Spender = nullptr);
-	
 	int32 GetTeamFunds() const { return TeamFunds; }
 	
+	void RegisterJobSite(AFlipperJobSite* JobSite);
+	TArray<TWeakObjectPtr<AFlipperJobSite>> GetJobSites() const { return JobSites; }
+	
 	FOnTeamFundsChanged OnTeamFundsChanged;
+	FOnJobSiteRegistered OnJobSiteRegistered;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -36,5 +41,8 @@ private:
 	UFUNCTION()
 	void OnRep_TeamFunds();
 	
+	// job sites exists on game state so that each client gets a copy of it locally and can react to changes
+	// don't need this to be in the game mode as the completion function can be bound to from World->GetAuthGameMode() on authority
+	TArray<TWeakObjectPtr<AFlipperJobSite>> JobSites;
 };
 

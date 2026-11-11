@@ -4,6 +4,7 @@
 #include "FlipperJobSite.h"
 
 #include "Core/FlipperGameMode.h"
+#include "Core/FlipperGameState.h"
 #include "Interactables/Instances/Units/FlipperPaintableMesh.h"
 #include "Interactables/Instances/Units/FlipperUnitPickupMesh.h"
 #include "Net/UnrealNetwork.h"
@@ -35,7 +36,6 @@ void AFlipperJobSite::Interact_Implementation(AActor* Interactor)
 	if (JobState != EFlipperJobState::NotStarted) return;
 	
 	SetJobState(EFlipperJobState::InProgress);
-	OnJobSiteStateChanged.ExecuteIfBound(JobState);
 }
 
 FFlipperInteractText AFlipperJobSite::GetInteractText(AActor* Interactor)
@@ -91,15 +91,13 @@ void AFlipperJobSite::SetJobState(EFlipperJobState NewJobState)
 	if (!HasAuthority()) return;
 	
 	JobState = NewJobState;
+	OnRep_JobState();
 	
 	// update whether the interactable objects can be interacted with - whether the job is in progress
 	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
-	
-	OnJobSiteStateChanged.ExecuteIfBound(JobState);
-	
 	if (JobState == EFlipperJobState::Completed)
 	{
-		OnJobSiteCompleted.ExecuteIfBound(this);
+		OnJobSiteCompleted.Broadcast(this);
 	}
 }
 
@@ -111,8 +109,11 @@ void AFlipperJobSite::UpdateCompletionStatus()
 	if (JobProgress.CompletedPaintableMeshes == NumberPaintableMeshes && JobProgress.CompletedPickupMeshes == NumberPickupMeshes)
 	{
 		SetJobState(EFlipperJobState::Completed);
-		OnJobSiteStateChanged.ExecuteIfBound(JobState);
 	}
+	
+	// UpdateCompletionStatus is called after any change is made to JobProgress, so send out a message that progress has changed
+	OnJobSiteProgressChanged.Broadcast(JobProgress);
+	OnRep_JobProgress();
 }
 
 void AFlipperJobSite::HandlePaintableMeshCompleted(AFlipperPaintableMesh* Mesh, APawn* FinishedBy)
@@ -148,6 +149,21 @@ void AFlipperJobSite::SetInteractablesCanInteract(const bool bNewCanInteract)
 	}
 }
 
+void AFlipperJobSite::OnRep_JobState()
+{
+	OnJobSiteStateChanged.Broadcast(this, JobState);
+	
+	if (JobState == EFlipperJobState::Completed)
+	{
+		OnJobSiteCompleted.Broadcast(this);
+	}
+}
+
+void AFlipperJobSite::OnRep_JobProgress()
+{
+	OnJobSiteProgressChanged.Broadcast(JobProgress);
+}
+
 // Called when the game starts or when spawned
 void AFlipperJobSite::BeginPlay()
 {
@@ -174,10 +190,21 @@ void AFlipperJobSite::BeginPlay()
 		NumberPickupMeshes++;
 	}
 	
-	// mark interactable objects as unable to be interacted with, then register the job site only on the server
-	if (!bHasAuthority) return;
+	// get the game state and register each job site locally for each user,
+	// GameState->RegisterJobSite handles authority binding to OnCompleted for completion payouts
+	// this allows game state to be retrieved anywhere on clients for local bindings (i.e. UI) 
+	const UWorld* World = GetWorld();
+	if (World)
+	{
+		AFlipperGameState* FlipperGameState = World->GetGameState<AFlipperGameState>();
+		if (FlipperGameState)
+		{
+			FlipperGameState->RegisterJobSite(this);
+		}
+	}
 	
+	// mark interactable objects as unable to be interacted with
+	if (!bHasAuthority) return;
 	SetInteractablesCanInteract(false);
-	GetWorld()->GetAuthGameMode<AFlipperGameMode>()->RegisterJobSite(this);
 	
 }
