@@ -14,8 +14,6 @@
 // Sets default values
 AFlipperUnitProvider::AFlipperUnitProvider()
 {
-	bReplicates = true;
-
 	FillStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FillStaticMeshComponent"));
 }
 

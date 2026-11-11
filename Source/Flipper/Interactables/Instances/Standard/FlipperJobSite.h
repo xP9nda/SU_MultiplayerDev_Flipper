@@ -83,10 +83,10 @@ private:
 	
 	void SetJobState(EFlipperJobState NewJobState);
 	void UpdateCompletionStatus();
+	void SetInteractablesCanInteract(bool bNewCanInteract);
 
 	UFUNCTION()
 	void HandlePaintableMeshCompleted(AFlipperPaintableMesh* Mesh, APawn* FinishedBy);
 	UFUNCTION()
 	void HandlePickupMeshCompleted(AFlipperUnitPickupMesh* Mesh, APawn* FinishedBy);
-
 };

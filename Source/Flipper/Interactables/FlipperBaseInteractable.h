@@ -17,6 +17,8 @@ class FLIPPER_API AFlipperBaseInteractable : public AActor, public IFlipperInter
 public:
 	// Sets default values for this actor's properties
 	AFlipperBaseInteractable();
+	
+	void SetCanInteract(bool bCanInteract);
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,4 +29,10 @@ protected:
 public:
 	virtual void Interact_Implementation(AActor* Interactor) override;
 	virtual FFlipperInteractText GetInteractText(AActor* Interactor) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool GetCanInteract() const override;
+
+private:
+	UPROPERTY(Replicated)
+	bool bCanInteract = true;
 };

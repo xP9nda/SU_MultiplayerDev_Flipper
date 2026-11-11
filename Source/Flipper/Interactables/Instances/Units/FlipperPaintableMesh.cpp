@@ -12,8 +12,6 @@
 // Sets default values
 AFlipperPaintableMesh::AFlipperPaintableMesh()
 {
-	bReplicates = true;
-	
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 }
 

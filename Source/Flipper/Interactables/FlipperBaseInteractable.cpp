@@ -4,6 +4,7 @@
 #include "FlipperBaseInteractable.h"
 
 #include "Components/FlipperOutlineComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -11,8 +12,17 @@ AFlipperBaseInteractable::AFlipperBaseInteractable()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	OutlineComponent = CreateDefaultSubobject<UFlipperOutlineComponent>(TEXT("OutlineComponent"));
+}
+
+void AFlipperBaseInteractable::SetCanInteract(const bool NewCanInteract)
+{
+	if (!HasAuthority()) return;
+	if (bCanInteract == NewCanInteract) return;
+	
+	bCanInteract = NewCanInteract;
 }
 
 // Called when the game starts or when spawned
@@ -36,3 +46,13 @@ FFlipperInteractText AFlipperBaseInteractable::GetInteractText(AActor* Interacto
 	return NewInteractText;
 }
 
+void AFlipperBaseInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AFlipperBaseInteractable, bCanInteract);
+}
+
+bool AFlipperBaseInteractable::GetCanInteract() const
+{
+	return bCanInteract;
+}

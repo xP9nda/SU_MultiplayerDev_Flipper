@@ -36,5 +36,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(AActor* Interactor);
 
+	virtual bool GetCanInteract() const { return true; } // return a default value of true if the function is not overridden
 	virtual FFlipperInteractText GetInteractText(AActor* Interactor) = 0;
 };

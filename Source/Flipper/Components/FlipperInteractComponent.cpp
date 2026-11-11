@@ -46,6 +46,14 @@ void UFlipperInteractComponent::LookingAtActorTimerHandler()
 	const FHitResult Hit = PerformLinetrace();
 	AActor* HitActor = Hit.bBlockingHit ? Hit.GetActor() : nullptr;
 	
+	// don't show any interaction indication if the hit actor cannot be interacted with
+	const IFlipperInteract* InteractInterface = Cast<IFlipperInteract>(Hit.GetActor());
+	if (InteractInterface && !InteractInterface->GetCanInteract())
+	{
+		// treat a non-interactable actor as if nothing was hit, so the previous outline and text can get cleared appropriately
+		HitActor = nullptr;
+	}
+	
 	if (HitActor == PreviouslyLookedAtActor.Get()) return; // already looking at the actor
 	
 	// hide the outline on the previously looked at actor, if it's still valid and exists
@@ -107,6 +115,10 @@ void UFlipperInteractComponent::AttemptInteract()
 	if (!Hit.bBlockingHit) return; // nothing was hit
 	if (!Hit.GetActor()) return; // hit actor is invalid
 	if (!Hit.GetActor()->Implements<UFlipperInteract>()) return; // if hit actor doesn't implement interact
+
+	// ensure interaction is enabled on the hit actor
+	const IFlipperInteract* InteractInterface = Cast<IFlipperInteract>(Hit.GetActor());
+	if (InteractInterface && !InteractInterface->GetCanInteract()) return;
 	
 	LocalAllowedInteractionTime = CurrentTime + InteractionCooldown;
 	
@@ -127,6 +139,10 @@ void UFlipperInteractComponent::Server_AttemptInteraction_Implementation()
 	if (!Hit.bBlockingHit) return; // nothing was hit
 	if (!Hit.GetActor()) return; // hit actor is invalid
 	if (!Hit.GetActor()->Implements<UFlipperInteract>()) return; // if hit actor doesn't implement interact
+	
+	// ensure interaction is enabled on the hit actor
+	const IFlipperInteract* InteractInterface = Cast<IFlipperInteract>(Hit.GetActor());
+	if (InteractInterface && !InteractInterface->GetCanInteract()) return;
 	
 	AllowedInteractionTime = CurrentTime + (InteractionCooldown * 0.9f); // allow for a bit of network jitter
 	

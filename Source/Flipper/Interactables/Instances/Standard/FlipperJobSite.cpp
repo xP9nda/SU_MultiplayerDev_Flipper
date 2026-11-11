@@ -14,7 +14,6 @@ AFlipperJobSite::AFlipperJobSite()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true;
 }
 
 void AFlipperJobSite::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -35,7 +34,7 @@ void AFlipperJobSite::Interact_Implementation(AActor* Interactor)
 	if (!HasAuthority()) return;
 	if (JobState != EFlipperJobState::NotStarted) return;
 	
-	JobState = EFlipperJobState::InProgress;
+	SetJobState(EFlipperJobState::InProgress);
 	OnJobSiteStateChanged.ExecuteIfBound(JobState);
 }
 
@@ -92,7 +91,16 @@ void AFlipperJobSite::SetJobState(EFlipperJobState NewJobState)
 	if (!HasAuthority()) return;
 	
 	JobState = NewJobState;
+	
+	// update whether the interactable objects can be interacted with - whether the job is in progress
+	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
+	
 	OnJobSiteStateChanged.ExecuteIfBound(JobState);
+	
+	if (JobState == EFlipperJobState::Completed)
+	{
+		OnJobSiteCompleted.ExecuteIfBound(this);
+	}
 }
 
 void AFlipperJobSite::UpdateCompletionStatus()
@@ -102,9 +110,8 @@ void AFlipperJobSite::UpdateCompletionStatus()
 	
 	if (JobProgress.CompletedPaintableMeshes == NumberPaintableMeshes && JobProgress.CompletedPickupMeshes == NumberPickupMeshes)
 	{
-		JobState = EFlipperJobState::Completed;
+		SetJobState(EFlipperJobState::Completed);
 		OnJobSiteStateChanged.ExecuteIfBound(JobState);
-		OnJobSiteCompleted.ExecuteIfBound(this);
 	}
 }
 
@@ -124,6 +131,21 @@ void AFlipperJobSite::HandlePickupMeshCompleted(AFlipperUnitPickupMesh* Mesh, AP
 	
 	JobProgress.CompletedPickupMeshes++;
 	UpdateCompletionStatus();
+}
+
+void AFlipperJobSite::SetInteractablesCanInteract(const bool bNewCanInteract)
+{
+	for (TObjectPtr<AFlipperPaintableMesh> Mesh : PaintableMeshes)
+	{
+		if (!IsValid(Mesh)) continue;
+		Mesh->SetCanInteract(bNewCanInteract);
+	}
+
+	for (TObjectPtr<AFlipperUnitPickupMesh> Mesh : PickupMeshes)
+	{
+		if (!IsValid(Mesh)) continue;
+		Mesh->SetCanInteract(bNewCanInteract);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -152,8 +174,10 @@ void AFlipperJobSite::BeginPlay()
 		NumberPickupMeshes++;
 	}
 	
-	// register the job site only on the server
+	// mark interactable objects as unable to be interacted with, then register the job site only on the server
 	if (!bHasAuthority) return;
+	
+	SetInteractablesCanInteract(false);
 	GetWorld()->GetAuthGameMode<AFlipperGameMode>()->RegisterJobSite(this);
 	
 }
