@@ -25,9 +25,6 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
-	UFUNCTION()
-	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
-	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Flipper|Tools")
 	void OnSelectedToolChanged(bool bIsToolSelected);
 	

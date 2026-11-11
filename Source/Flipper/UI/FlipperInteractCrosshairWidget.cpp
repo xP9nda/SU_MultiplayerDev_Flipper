@@ -39,11 +39,11 @@ void UFlipperInteractCrosshairWidget::NativeConstruct()
 		InteractProgressImage->SetBrushFromMaterial(InteractProgressMaterialDynamic.Get());
 	}
 	
-	AController* OwningController = GetOwningPlayer();
-	if (!OwningController) return;
-	
-	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperInteractCrosshairWidget::HandlePossessedPawnChanged);
-	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
+	APawn* OwningPawn = GetOwningPlayerPawn();
+	if (OwningPawn)
+	{
+		ObserveInteractComponent(OwningPawn->GetComponentByClass<UFlipperInteractComponent>());
+	}
 }
 
 void UFlipperInteractCrosshairWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -68,22 +68,10 @@ void UFlipperInteractCrosshairWidget::NativeTick(const FGeometry& MyGeometry, fl
 
 void UFlipperInteractCrosshairWidget::NativeDestruct()
 {
-	AController* OwningController = GetOwningPlayer();
-	if (OwningController)
-	{
-		// unbind the pawn changed delegate
-		OwningController->OnPossessedPawnChanged.RemoveDynamic(this, &UFlipperInteractCrosshairWidget::HandlePossessedPawnChanged);
-	}
-	
 	// force no new component and therefore a clean-up on the old component bindings
 	ObserveInteractComponent(nullptr);
 	
 	Super::NativeDestruct();
-}
-
-void UFlipperInteractCrosshairWidget::HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
-{
-	ObserveInteractComponent(NewPawn ? NewPawn->GetComponentByClass<UFlipperInteractComponent>() : nullptr);
 }
 
 void UFlipperInteractCrosshairWidget::HandleOnInteract()

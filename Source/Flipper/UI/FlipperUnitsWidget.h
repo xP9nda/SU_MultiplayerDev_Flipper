@@ -25,9 +25,6 @@ protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
 
-	UFUNCTION()
-	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
-
 	UPROPERTY(BlueprintReadOnly, Category = "Flipper|Units")
 	TObjectPtr<UFlipperUsableUnitComponent> ObservedUnitComponent;
 	

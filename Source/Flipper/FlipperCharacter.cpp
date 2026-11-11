@@ -9,9 +9,11 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Flipper.h"
+#include "FlipperPlayerController.h"
 #include "Cheats/FlipperCheatManager.h"
 #include "Components/FlipperInteractComponent.h"
 #include "Components/FlipperToolComponent.h"
+#include "Core/FlipperHUD.h"
 #include "Core/FlipperPlayerState.h"
 
 AFlipperCharacter::AFlipperCharacter()
@@ -278,4 +280,18 @@ void AFlipperCharacter::BeginPlay()
 	
 	// apply the current tool immediately
 	HandleToolChanged(ToolComponent->GetCurrentTool());
+}
+
+void AFlipperCharacter::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+
+	
+	AFlipperPlayerController* OwnerController = GetOwner<AFlipperPlayerController>();
+	if (!OwnerController) return;
+	
+	AFlipperHUD* HUD = OwnerController->GetHUD<AFlipperHUD>();
+	if (!HUD) return;
+	
+	HUD->CreateHUD();
 }

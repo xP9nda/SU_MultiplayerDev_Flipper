@@ -14,26 +14,18 @@ void UFlipperInteractTextWidget::NativeConstruct()
 	AController* OwningController = GetOwningPlayer();
 	if (!OwningController) return;
 	
-	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperInteractTextWidget::HandlePossessedPawnChanged);
-	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
+	APawn* OwningPawn = GetOwningPlayerPawn();
+	if (OwningPawn)
+	{
+		ObserveComponent(OwningPawn->GetComponentByClass<UFlipperInteractComponent>());
+	}
 }
 
 void UFlipperInteractTextWidget::NativeDestruct()
 {
-	AController* OwningController = GetOwningPlayer();
-	if (OwningController)
-	{
-		OwningController->OnPossessedPawnChanged.RemoveDynamic(this, &UFlipperInteractTextWidget::HandlePossessedPawnChanged);
-	}
-	
 	ObserveComponent(nullptr);
 	
 	Super::NativeDestruct();
-}
-
-void UFlipperInteractTextWidget::HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
-{
-	ObserveComponent(NewPawn ? NewPawn->FindComponentByClass<UFlipperInteractComponent>() : nullptr);
 }
 
 void UFlipperInteractTextWidget::ObserveComponent(UFlipperInteractComponent* NewComponent)

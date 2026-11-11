@@ -21,9 +21,6 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
-	UFUNCTION()
-	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
-	
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> InteractMainText;

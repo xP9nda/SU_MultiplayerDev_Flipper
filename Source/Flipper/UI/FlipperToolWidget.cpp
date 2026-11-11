@@ -22,29 +22,18 @@ void UFlipperToolWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	AController* OwningController = GetOwningPlayer();
-	if (!OwningController) return;
-	
-	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperToolWidget::HandlePossessedPawnChanged);
-	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
+	APawn* OwningPawn = GetOwningPlayerPawn();
+	if (OwningPawn)
+	{
+		ObserveComponent(OwningPawn->GetComponentByClass<UFlipperToolComponent>());
+	}
 }
 
 void UFlipperToolWidget::NativeDestruct()
 {
-	AController* OwningController = GetOwningPlayer();
-	if (OwningController)
-	{
-		OwningController->OnPossessedPawnChanged.RemoveDynamic(this, &UFlipperToolWidget::HandlePossessedPawnChanged);
-	}
-	
 	ObserveComponent(nullptr);
 	
 	Super::NativeDestruct();
-}
-
-void UFlipperToolWidget::HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
-{
-	ObserveComponent(NewPawn ? NewPawn->FindComponentByClass<UFlipperToolComponent>() : nullptr);
 }
 
 void UFlipperToolWidget::ObserveComponent(UFlipperToolComponent* NewComponent)

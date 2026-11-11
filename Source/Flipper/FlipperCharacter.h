@@ -155,6 +155,7 @@ protected:
 
 public:
 	virtual void BeginPlay() override;
+	virtual void PawnClientRestart() override;
 
 	/** Returns the first person mesh **/
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }

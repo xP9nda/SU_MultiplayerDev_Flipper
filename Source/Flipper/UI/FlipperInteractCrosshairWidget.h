@@ -21,9 +21,6 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeDestruct() override;
-
-	UFUNCTION()
-	void HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Flipper|Interaction")
 	TObjectPtr<UFlipperInteractComponent> ObservedInteractComponent;

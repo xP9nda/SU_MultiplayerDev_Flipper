@@ -8,7 +8,10 @@
 void AFlipperHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	
+}
+
+void AFlipperHUD::CreateHUD()
+{
 	APlayerController* OwningController = GetOwningPlayerController();
 	if (!OwningController) return;
 	

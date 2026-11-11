@@ -28,12 +28,11 @@ void UFlipperUnitsWidget::NativeConstruct()
 		UnitsProgressImage->SetBrushFromMaterial(UnitsProgressMaterialDynamic.Get());
 	}
 	
-	AController* OwningController = GetOwningPlayer();
-	if (!OwningController) return;
-	
-	// bind to a new pawn, so that if the character is slow to spawn in, the component delegate bindings are still set up
-	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UFlipperUnitsWidget::HandlePossessedPawnChanged);
-	HandlePossessedPawnChanged(nullptr, OwningController->GetPawn());
+	APawn* OwningPawn = GetOwningPlayerPawn();
+	if (OwningPawn)
+	{
+		ObserveToolComponent(OwningPawn->GetComponentByClass<UFlipperToolComponent>());
+	}
 }
 
 void UFlipperUnitsWidget::NativePreConstruct()
@@ -43,13 +42,6 @@ void UFlipperUnitsWidget::NativePreConstruct()
 
 void UFlipperUnitsWidget::NativeDestruct()
 {
-	AController* OwningController = GetOwningPlayer();
-	if (OwningController)
-	{
-		// unbind the pawn changed delegate
-		OwningController->OnPossessedPawnChanged.RemoveDynamic(this, &UFlipperUnitsWidget::HandlePossessedPawnChanged);
-	}
-	
 	// force no new component and therefore a clean-up on the old component bindings
 	ObserveToolComponent(nullptr);
 	ObserveUnitsComponent(nullptr);
@@ -114,11 +106,6 @@ void UFlipperUnitsWidget::HandleToolChanged(FGameplayTag NewTool)
 	CurrentToolDisplayNameText->SetText(CurrentToolName ? *CurrentToolName : FText::FromString("-"));
 	
 	ObserveUnitsComponent(UFlipperUsableUnitComponent::FindUnitComponentOfType(ObservedToolComponent->GetOwner(), NewTool));
-}
-
-void UFlipperUnitsWidget::HandlePossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
-{
-	ObserveToolComponent(NewPawn ? NewPawn->GetComponentByClass<UFlipperToolComponent>() : nullptr);
 }
 
 void UFlipperUnitsWidget::ClearDisplay()

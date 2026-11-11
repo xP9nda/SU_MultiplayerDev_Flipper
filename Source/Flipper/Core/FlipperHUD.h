@@ -16,6 +16,9 @@ class FLIPPER_API AFlipperHUD : public AHUD
 {
 	GENERATED_BODY()
 
+public:
+	void CreateHUD();
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
