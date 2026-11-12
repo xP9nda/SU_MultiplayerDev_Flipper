@@ -97,6 +97,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Toolbar")
 	UInputAction* ToolbarTool4Action;
 	
+	UPROPERTY(EditAnywhere, Category="Input|UI")
+	UInputAction* TablistAction;
+	
 public:
 	AFlipperCharacter();
 
@@ -125,22 +128,25 @@ protected:
 	virtual void DoJumpEnd();
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoToolScrollForward();
+	void DoToolScrollForward();
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoToolScrollBackward();
+	void DoToolScrollBackward();
 	
 	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
-	virtual void DoToolbarTool1();
+	void DoToolbarTool1();
 	
 	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
-	virtual void DoToolbarTool2();
+	void DoToolbarTool2();
 	
 	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
-	virtual void DoToolbarTool3();
+	void DoToolbarTool3();
 	
 	UFUNCTION(BlueprintCallable, Category="Input|Toolbar")
-	virtual void DoToolbarTool4();
+	void DoToolbarTool4();
+	
+	void DoTablistPressed();
+	void DoTablistReleased();
 	
 	UFUNCTION()
 	void HandleToolChanged(FGameplayTag NewTool);

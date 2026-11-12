@@ -17,11 +17,15 @@ public:
 	AFlipperGameMode();
 	
 	UFUNCTION()
-	void HandleJobSiteCompleted(AFlipperJobSite* JobSite) const;
+	void HandleJobSiteCompleted(AFlipperJobSite* JobSite);
 	
 protected:
 	virtual void BeginPlay() override;
-	
+
+public:
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	int32 StartingMoney = 100;

@@ -4,10 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "FFlipperStepsContribution.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerState.h"
 #include "FlipperPlayerState.generated.h"
 
+struct FGameplayTag;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContributionChanged);
+
+USTRUCT()
+struct FFlipperPickedUpCount
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FGameplayTag UnitType;
+	
+	UPROPERTY()
+	int32 Amount = 0;
+};
 
 UCLASS()
 class FLIPPER_API AFlipperPlayerState : public APlayerState
@@ -20,10 +34,13 @@ public:
 	void AddFundsEarned(int32 Amount);
 	void AddFundsSpent(int32 Amount);
 	void RemoveFundsSpent(int32 Amount);
+	void IncrementPickedUpCount(FGameplayTag UnitType);
 	
 	const FFlipperStepsContribution& GetSurfaceContribution() const { return SurfaceContribution; }
 	int32 GetFundsEarned() const { return FundsEarned; }
 	int32 GetFundsSpent() const { return FundsSpent; }
+	TArray<FFlipperPickedUpCount> GetPickedUpCounts() const { return PickedUpCounts; }
+	FFlipperPickedUpCount GetPickedUpCountForUnitType(FGameplayTag UnitType);
 	
 	FOnContributionChanged OnContributionChanged;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -39,7 +56,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
 	int32 FundsSpent = 0;
 	
+	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
+	TArray<FFlipperPickedUpCount> PickedUpCounts;
+	
 	UFUNCTION()
 	void OnRep_ContributionChanged();
 
+protected:
+	virtual void OverrideWith(APlayerState* PlayerState) override;
+	virtual void CopyProperties(APlayerState* PlayerState) override;
 };

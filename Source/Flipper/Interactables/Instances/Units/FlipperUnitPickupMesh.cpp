@@ -4,6 +4,7 @@
 #include "FlipperUnitPickupMesh.h"
 
 #include "Components/FlipperUsableUnitComponent.h"
+#include "Core/FlipperPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -35,6 +36,13 @@ void AFlipperUnitPickupMesh::Interact_Implementation(AActor* Interactor)
 	if (!UnitsComponent->TryAddUnit(UnitsToGive)) return;
 	
 	bIsPickedUp = true;
+	
+	// increment the number of picked up units for the interactor
+	AFlipperPlayerState* InteractorPlayerState = GetInteractorPlayerState(Interactor);
+	if (InteractorPlayerState)
+	{
+		InteractorPlayerState->IncrementPickedUpCount(UnitType);
+	}
 	
 	OnPickupMeshCompleted.Broadcast(this, Cast<APawn>(Interactor));
 	OnRep_PickedUp();

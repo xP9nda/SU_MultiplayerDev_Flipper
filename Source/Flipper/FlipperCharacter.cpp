@@ -95,7 +95,7 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFlipperCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AFlipperCharacter::LookInput);
 		
-		// Interaction - todo document
+		// Interaction
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, InteractionComponent.Get(), &UFlipperInteractComponent::AttemptInteract);
 		
 		// Tool Switching
@@ -106,6 +106,10 @@ void AFlipperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(ToolbarTool2Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool2);
 		EnhancedInputComponent->BindAction(ToolbarTool3Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool3);
 		EnhancedInputComponent->BindAction(ToolbarTool4Action, ETriggerEvent::Started, this, &AFlipperCharacter::DoToolbarTool4);
+		
+		// Tablist
+		EnhancedInputComponent->BindAction(TablistAction, ETriggerEvent::Started, this, &AFlipperCharacter::DoTablistPressed);
+		EnhancedInputComponent->BindAction(TablistAction, ETriggerEvent::Completed, this, &AFlipperCharacter::DoTablistReleased);
 	}
 	else
 	{
@@ -202,6 +206,28 @@ void AFlipperCharacter::DoToolbarTool4()
 	ToolComponent->SetToolIndex(3);
 }
 
+void AFlipperCharacter::DoTablistPressed()
+{
+	const APlayerController* OwningController = GetOwner<APlayerController>();
+	if (!OwningController) return;
+	
+	AFlipperHUD* FlipperHUD = OwningController->GetHUD<AFlipperHUD>();
+	if (!FlipperHUD) return;
+	
+	FlipperHUD->SetTablistVisible(true);
+}
+
+void AFlipperCharacter::DoTablistReleased()
+{
+	const APlayerController* OwningController = GetOwner<APlayerController>();
+	if (!OwningController) return;
+	
+	AFlipperHUD* FlipperHUD = OwningController->GetHUD<AFlipperHUD>();
+	if (!FlipperHUD) return;
+	
+	FlipperHUD->SetTablistVisible(false);
+}
+
 void AFlipperCharacter::HandleToolChanged(FGameplayTag NewTool)
 {
 	UStaticMesh* ToolMesh = ToolComponent ? ToolComponent->GetMeshForTool(NewTool) : nullptr;
@@ -285,9 +311,8 @@ void AFlipperCharacter::BeginPlay()
 void AFlipperCharacter::PawnClientRestart()
 {
 	Super::PawnClientRestart();
-
 	
-	AFlipperPlayerController* OwnerController = GetOwner<AFlipperPlayerController>();
+	const AFlipperPlayerController* OwnerController = GetOwner<AFlipperPlayerController>();
 	if (!OwnerController) return;
 	
 	AFlipperHUD* HUD = OwnerController->GetHUD<AFlipperHUD>();

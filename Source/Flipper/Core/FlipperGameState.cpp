@@ -82,6 +82,13 @@ void AFlipperGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AFlipperGameState, TeamFunds);
 }
 
+void AFlipperGameState::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+	
+	OnMatchEnded.Broadcast();
+}
+
 void AFlipperGameState::OnRep_TeamFunds()
 {
 	OnTeamFundsChanged.Broadcast(TeamFunds);

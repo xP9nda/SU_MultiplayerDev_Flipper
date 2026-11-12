@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "FlipperHUD.generated.h"
 
+class UFlipperTablistWidget;
 class UUserWidget;
 
 /**
@@ -18,6 +19,7 @@ class FLIPPER_API AFlipperHUD : public AHUD
 
 public:
 	void CreateHUD();
+	void SetTablistVisible(bool bIsVisible);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -26,7 +28,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|HUD")
 	TSubclassOf<UUserWidget> HUDWidgetClass; 
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|HUD")
+	TSubclassOf<UFlipperTablistWidget> TablistWidgetClass;
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UUserWidget> HUDWidget;
+	
+	UPROPERTY()
+	TObjectPtr<UFlipperTablistWidget> TablistWidget;
 };

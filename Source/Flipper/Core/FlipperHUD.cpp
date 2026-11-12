@@ -4,6 +4,7 @@
 #include "FlipperHUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "UI/FlipperTablistWidget.h"
 
 void AFlipperHUD::BeginPlay()
 {
@@ -27,11 +28,37 @@ void AFlipperHUD::CreateHUD()
 	HUDWidget->AddToViewport();
 }
 
+void AFlipperHUD::SetTablistVisible(bool bIsVisible)
+{
+	// if the tablist widget does not exist, create it
+	if (!TablistWidget)
+	{
+		if (!bIsVisible || !TablistWidgetClass) return;
+		
+		TablistWidget = CreateWidget<UFlipperTablistWidget>(GetOwningPlayerController(), TablistWidgetClass);
+		if (!TablistWidget) return;
+		
+		TablistWidget->AddToViewport(99); // add the tablist on top of everything else
+	}
+	
+	bIsVisible ? TablistWidget->ShowTablist() : TablistWidget->HideTablist();
+	
+	// ensure the tablist is centered and doesn't fill the screen
+	TablistWidget->SetAnchorsInViewport(FAnchors(0.5f, 0.5f));
+	TablistWidget->SetAlignmentInViewport(FVector2D(0.5f, 0.5f));
+}
+
 void AFlipperHUD::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	
-	if (!HUDWidget) return;
+	if (TablistWidget)
+	{
+		TablistWidget->RemoveFromParent();
+	}
 	
-	HUDWidget->RemoveFromParent();
+	if (HUDWidget)
+	{
+		HUDWidget->RemoveFromParent();
+	}
 }
