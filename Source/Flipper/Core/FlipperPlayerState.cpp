@@ -110,6 +110,7 @@ void AFlipperPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(AFlipperPlayerState, SurfaceContribution);
 	DOREPLIFETIME(AFlipperPlayerState, FundsEarned);
 	DOREPLIFETIME(AFlipperPlayerState, FundsSpent);
+	DOREPLIFETIME(AFlipperPlayerState, PickedUpCounts);
 }
 
 void AFlipperPlayerState::OnRep_ContributionChanged()
@@ -129,6 +130,7 @@ void AFlipperPlayerState::OverrideWith(APlayerState* PlayerState)
 	SurfaceContribution = FlipperPlayerState->SurfaceContribution;
 	FundsEarned = FlipperPlayerState->FundsEarned;
 	FundsSpent = FlipperPlayerState->FundsSpent;
+	PickedUpCounts = FlipperPlayerState->PickedUpCounts;
 	
 	// ensure the set values are immediately reflected
 	OnRep_ContributionChanged();
@@ -145,4 +147,5 @@ void AFlipperPlayerState::CopyProperties(APlayerState* PlayerState)
 	FlipperPlayerState->SurfaceContribution = SurfaceContribution;
 	FlipperPlayerState->FundsEarned = FundsEarned;
 	FlipperPlayerState->FundsSpent = FundsSpent;
+	FlipperPlayerState->PickedUpCounts = PickedUpCounts;
 }
