@@ -95,10 +95,6 @@ void AFlipperJobSite::SetJobState(EFlipperJobState NewJobState)
 	
 	// update whether the interactable objects can be interacted with - whether the job is in progress
 	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
-	if (JobState == EFlipperJobState::Completed)
-	{
-		OnJobSiteCompleted.Broadcast(this);
-	}
 }
 
 void AFlipperJobSite::UpdateCompletionStatus()
