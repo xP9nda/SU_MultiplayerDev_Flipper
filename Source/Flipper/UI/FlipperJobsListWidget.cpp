@@ -48,6 +48,12 @@ void UFlipperJobsListWidget::OnJobSiteRegistered(AFlipperJobSite* JobSite)
 	
 	// listen for when the state is changed, calling OnJobSiteStateChanged when it is
 	JobSite->OnJobSiteStateChanged.AddUniqueDynamic(this, &UFlipperJobsListWidget::OnJobSiteStateChanged);
+	
+	// if the job site state is already in progress, manually call the delegate callback
+	if (JobSite->GetJobState() == EFlipperJobState::InProgress)
+	{
+		OnJobSiteStateChanged(JobSite, JobSite->GetJobState());
+	}
 }
 
 void UFlipperJobsListWidget::OnJobSiteStateChanged(AFlipperJobSite* JobSite, EFlipperJobState JobState)
