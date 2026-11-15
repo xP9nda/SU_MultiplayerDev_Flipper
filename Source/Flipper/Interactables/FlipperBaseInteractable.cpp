@@ -19,7 +19,6 @@ AFlipperBaseInteractable::AFlipperBaseInteractable()
 
 void AFlipperBaseInteractable::SetCanInteract(const bool NewCanInteract)
 {
-	if (!HasAuthority()) return;
 	if (bCanInteract == NewCanInteract) return;
 	
 	bCanInteract = NewCanInteract;
@@ -44,12 +43,6 @@ FFlipperInteractText AFlipperBaseInteractable::GetInteractText(AActor* Interacto
 	NewInteractText.DescriptionText = FText();
 	
 	return NewInteractText;
-}
-
-void AFlipperBaseInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AFlipperBaseInteractable, bCanInteract);
 }
 
 bool AFlipperBaseInteractable::GetCanInteract() const

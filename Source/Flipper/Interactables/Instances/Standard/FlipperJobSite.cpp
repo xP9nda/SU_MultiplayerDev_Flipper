@@ -92,9 +92,6 @@ void AFlipperJobSite::SetJobState(EFlipperJobState NewJobState)
 	
 	JobState = NewJobState;
 	OnRep_JobState();
-	
-	// update whether the interactable objects can be interacted with - whether the job is in progress
-	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
 }
 
 void AFlipperJobSite::UpdateCompletionStatus()
@@ -153,6 +150,9 @@ void AFlipperJobSite::OnRep_JobState()
 	{
 		OnJobSiteCompleted.Broadcast(this);
 	}
+	
+	// update interactable can interact locally, so that it's not replicated, massive overhead in replication and this can be derived instead
+	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
 }
 
 void AFlipperJobSite::OnRep_JobProgress()
@@ -199,8 +199,7 @@ void AFlipperJobSite::BeginPlay()
 		}
 	}
 	
-	// mark interactable objects as unable to be interacted with
-	if (!bHasAuthority) return;
-	SetInteractablesCanInteract(false);
-	
+	// initially set whether the interactables can interact on all clients and the server's copy
+	// bCanInteract on base interactable is not replicated, but the server has to have the true value of whether interaction is allowed, while ensuring clients match that state
+	SetInteractablesCanInteract(JobState == EFlipperJobState::InProgress);
 }
