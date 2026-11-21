@@ -4,9 +4,12 @@
 #include "FlipperTablistWidget.h"
 
 #include "FlipperTablistRowWidget.h"
+#include "Components/Button.h"
 #include "Components/VerticalBox.h"
+#include "Core/FlipperGameInstance.h"
 #include "Core/FlipperPlayerState.h"
 #include "GameFramework/GameStateBase.h"
+#include "Subsystems/FlipperSessionSubsystem.h"
 
 void UFlipperTablistWidget::ShowTablist()
 {
@@ -32,6 +35,26 @@ void UFlipperTablistWidget::HideTablist()
 		OwningPlayer->SetShowMouseCursor(false);
 		OwningPlayer->SetInputMode(FInputModeGameOnly());
 	}
+}
+
+void UFlipperTablistWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	if (LeaveSessionButton)
+	{
+		LeaveSessionButton->OnPressed.AddUniqueDynamic(this, &UFlipperTablistWidget::OnLeaveSessionButtonPressed);
+	}
+}
+
+void UFlipperTablistWidget::NativeDestruct()
+{
+	if (LeaveSessionButton)
+	{
+		LeaveSessionButton->OnPressed.RemoveAll(this);
+	}
+	
+	Super::NativeDestruct();
 }
 
 void UFlipperTablistWidget::RebuildTablist()
@@ -64,4 +87,13 @@ void UFlipperTablistWidget::RebuildTablist()
 		RowWidget->Setup(FlipperPlayerState);
 		PlayerRowsVerticalBox->AddChildToVerticalBox(RowWidget);
 	}
+}
+
+void UFlipperTablistWidget::OnLeaveSessionButtonPressed()
+{
+	const UFlipperGameInstance* GameInstance = GetGameInstance<UFlipperGameInstance>();
+	UFlipperSessionSubsystem* SessionSubsystem = GameInstance ? GameInstance->GetSubsystem<UFlipperSessionSubsystem>() : nullptr;
+	if (!SessionSubsystem) return;
+	
+	SessionSubsystem->LeaveSession();
 }

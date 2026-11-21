@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "FlipperTablistWidget.generated.h"
 
+class UButton;
 class UFlipperTablistRowWidget;
 class UVerticalBox;
 /**
@@ -19,13 +20,23 @@ class FLIPPER_API UFlipperTablistWidget : public UUserWidget
 public:
 	void ShowTablist();
 	void HideTablist();
+
+protected:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVerticalBox> PlayerRowsVerticalBox;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> LeaveSessionButton; 
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
 	TSubclassOf<UFlipperTablistRowWidget> RowWidgetClass;
 	
 	void RebuildTablist();
+	
+	UFUNCTION()
+	void OnLeaveSessionButtonPressed();
 };
