@@ -9,6 +9,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "Core/FlipperGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Subsystems/FlipperSessionSubsystem.h"
 
 void UFlipperMenuHUDWidget::SetMenuPageIndex(EFlipperMainMenuPageIndex NewIndex)
@@ -62,6 +63,11 @@ void UFlipperMenuHUDWidget::NativeConstruct()
 		ReturnToCallToActionButton->OnPressed.AddUniqueDynamic(this, &UFlipperMenuHUDWidget::OnReturnToCallToActionButtonPressed);
 	}
 	
+	if (CloseGameButton)
+	{
+		CloseGameButton->OnPressed.AddUniqueDynamic(this, &UFlipperMenuHUDWidget::OnCloseGameButtonPressed);
+	}
+	
 	if (SessionErrorTextBlock)
 	{
 		UFlipperSessionSubsystem* SessionSubsystem = GetGameInstance() ? GetGameInstance()->GetSubsystem<UFlipperSessionSubsystem>() : nullptr;
@@ -82,10 +88,20 @@ void UFlipperMenuHUDWidget::NativeDestruct()
 		ReturnToCallToActionButton->OnPressed.RemoveAll(this);
 	}
 	
+	if (CloseGameButton)
+	{
+		CloseGameButton->OnPressed.RemoveAll(this);
+	}
+	
 	Super::NativeDestruct();
 }
 
 void UFlipperMenuHUDWidget::OnReturnToCallToActionButtonPressed()
 {
 	SetMenuPageIndex(EFlipperMainMenuPageIndex::CallToAction);
+}
+
+void UFlipperMenuHUDWidget::OnCloseGameButtonPressed()
+{
+	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, false);
 }

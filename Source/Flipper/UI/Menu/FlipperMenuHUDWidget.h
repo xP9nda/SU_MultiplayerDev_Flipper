@@ -56,7 +56,13 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> SearchResultWidgetClass;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> CloseGameButton;
+	
 	UFUNCTION()
 	void OnReturnToCallToActionButtonPressed();
+	
+	UFUNCTION()
+	void OnCloseGameButtonPressed();
 
 };
