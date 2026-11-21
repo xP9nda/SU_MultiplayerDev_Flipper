@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJobSiteRegistered, AFlipperJobSit
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMatchEnded);
 
 UCLASS()
-class FLIPPER_API AFlipperGameState : public AGameState
+class FLIPPER_API AFlipperGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	
@@ -33,9 +33,6 @@ public:
 	FOnMatchEnded OnMatchEnded;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-protected:
-	virtual void HandleMatchHasEnded() override;
 	
 private:
 	// team funds is a shared state so it lives on the game state as every client has it,

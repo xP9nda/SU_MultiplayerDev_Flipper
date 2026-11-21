@@ -31,9 +31,8 @@ void AFlipperGameMode::HandleJobSiteCompleted(AFlipperJobSite* JobSite)
 		if (Site->GetJobState() != EFlipperJobState::Completed) return; 
 	}
 	
-	// at this point all job sites are completed, so call EndMatch
-	// AGameMode moves to MatchState::WaitingPostMatch which replicates in the game state
-	EndMatch();
+	// at this point all job sites are completed, so fire a delegate to show the result to everyone
+	// todo
 }
 
 void AFlipperGameMode::BeginPlay()

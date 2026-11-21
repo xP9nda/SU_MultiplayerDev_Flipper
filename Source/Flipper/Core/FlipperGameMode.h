@@ -9,7 +9,7 @@
 class AFlipperJobSite;
 
 UCLASS(Abstract)
-class AFlipperGameMode : public AGameMode
+class AFlipperGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
