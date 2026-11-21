@@ -4,7 +4,6 @@
 #include "FlipperBaseInteractable.h"
 
 #include "Components/FlipperOutlineComponent.h"
-#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
