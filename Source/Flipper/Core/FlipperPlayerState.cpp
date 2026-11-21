@@ -118,28 +118,3 @@ void AFlipperPlayerState::OnRep_ContributionChanged()
 	OnContributionChanged.Broadcast();
 }
 
-void AFlipperPlayerState::OverrideWith(APlayerState* PlayerState)
-{
-	Super::OverrideWith(PlayerState);
-	
-	// no longer sets the variables from the playerstate that's passed in
-	// the engine swaps in the saved inactive player state
-	// PlayerState passed into this function is the empty (and not used due to restored one) one made at PostLogin
-	
-	// ensure the restored values are immediately reflected
-	OnRep_ContributionChanged();
-}
-
-void AFlipperPlayerState::CopyProperties(APlayerState* PlayerState)
-{
-	Super::CopyProperties(PlayerState);
-	
-	AFlipperPlayerState* FlipperPlayerState = Cast<AFlipperPlayerState>(PlayerState);
-	if (!FlipperPlayerState) return;
-		
-	// copy this player state's properties into the player state provided
-	FlipperPlayerState->SurfaceContribution = SurfaceContribution;
-	FlipperPlayerState->FundsEarned = FundsEarned;
-	FlipperPlayerState->FundsSpent = FundsSpent;
-	FlipperPlayerState->PickedUpCounts = PickedUpCounts;
-}

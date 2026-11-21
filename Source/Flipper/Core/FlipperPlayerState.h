@@ -61,8 +61,4 @@ private:
 	
 	UFUNCTION()
 	void OnRep_ContributionChanged();
-
-protected:
-	virtual void OverrideWith(APlayerState* PlayerState) override;
-	virtual void CopyProperties(APlayerState* PlayerState) override;
 };
