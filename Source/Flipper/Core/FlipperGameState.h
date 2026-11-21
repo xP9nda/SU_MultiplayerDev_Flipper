@@ -12,8 +12,6 @@ class AFlipperPlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamFundsChanged, int32, NewFunds);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJobSiteRegistered, AFlipperJobSite*, JobSite);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMatchEnded);
-
 UCLASS()
 class FLIPPER_API AFlipperGameState : public AGameStateBase
 {
@@ -30,7 +28,6 @@ public:
 	
 	FOnTeamFundsChanged OnTeamFundsChanged;
 	FOnJobSiteRegistered OnJobSiteRegistered;
-	FOnMatchEnded OnMatchEnded;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
