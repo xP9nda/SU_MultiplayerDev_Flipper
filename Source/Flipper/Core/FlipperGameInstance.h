@@ -21,4 +21,19 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Tools", meta = (Categories = "Units"))
 	TMap<FGameplayTag, FText> ToolNames;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Settings")
+	TSoftObjectPtr<UWorld> MenuLevel;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Settings")
+	TSoftObjectPtr<UWorld> GameLevel;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Settings")
+	int32 SessionMaxPublicConnections = 4;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Settings")
+	int32 MaxSessionSearchResults = 50;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flipper|Settings")
+	bool bSessionLanConnections = true;
 };

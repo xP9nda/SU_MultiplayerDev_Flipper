@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Core/FFlipperStepsContribution.h"
+#include "Core/FlipperStepTypes.h"
 #include "Interactables/Instances/FlipperUnitsBaseInteractable.h"
 #include "FlipperPaintableMesh.generated.h"
 
@@ -68,7 +68,7 @@ private:
 	FGameplayTag CurrentFinish;
 	
 	// the number of steps completed per player to track contributions
-	TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepsContribution> StepsPerPlayer;
+	TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepContribution> StepsPerPlayer;
 	
 	UFUNCTION()
 	void OnRep_PaintState();
@@ -78,7 +78,7 @@ public:
 	FOnPaintableMeshCompleted OnPaintableMeshCompleted;
 	
 	bool IsCompleteAndCorrect() const;
-	const TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepsContribution>& GetStepsPerPlayer() const { return StepsPerPlayer; }
+	const TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepContribution>& GetStepsPerPlayer() const { return StepsPerPlayer; }
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;

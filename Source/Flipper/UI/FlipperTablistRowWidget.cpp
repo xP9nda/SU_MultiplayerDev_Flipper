@@ -51,7 +51,7 @@ void UFlipperTablistRowWidget::RefreshVisuals()
 	AFlipperPlayerState* PlayerState = ObservedPlayerState.Get();
 	if (!PlayerState) return;
 	
-	const FFlipperStepsContribution& SurfaceContribution = PlayerState->GetSurfaceContribution();
+	const FFlipperStepContribution& SurfaceContribution = PlayerState->GetSurfaceContribution();
 	
 	PlayerNameTextBlock->SetText(FText::FromString(PlayerState->GetPlayerName()));
 	CorrectStepsTextBlock->SetText(FText::AsNumber(SurfaceContribution.CorrectSteps));

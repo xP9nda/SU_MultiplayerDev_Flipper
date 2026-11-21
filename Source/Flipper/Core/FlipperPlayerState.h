@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FFlipperStepsContribution.h"
+#include "FlipperStepTypes.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/PlayerState.h"
 #include "FlipperPlayerState.generated.h"
@@ -36,7 +36,7 @@ public:
 	void RemoveFundsSpent(int32 Amount);
 	void IncrementPickedUpCount(FGameplayTag UnitType);
 	
-	const FFlipperStepsContribution& GetSurfaceContribution() const { return SurfaceContribution; }
+	const FFlipperStepContribution& GetSurfaceContribution() const { return SurfaceContribution; }
 	int32 GetFundsEarned() const { return FundsEarned; }
 	int32 GetFundsSpent() const { return FundsSpent; }
 	TArray<FFlipperPickedUpCount> GetPickedUpCounts() const { return PickedUpCounts; }
@@ -48,7 +48,7 @@ public:
 private:
 	// use the same OnRep function as the scoreboard only needs to know "something changed"
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
-	FFlipperStepsContribution SurfaceContribution;
+	FFlipperStepContribution SurfaceContribution;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_ContributionChanged)
 	int32 FundsEarned = 0;

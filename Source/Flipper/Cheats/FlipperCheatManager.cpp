@@ -3,7 +3,7 @@
 
 #include "FlipperCheatManager.h"
 
-#include "FlipperPlayerController.h"
+#include "Player/Gameplay/FlipperPlayerController.h"
 
 void UFlipperCheatManager::FlipperAddFunds(int32 Amount)
 {

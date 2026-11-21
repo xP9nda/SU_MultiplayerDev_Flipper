@@ -3,7 +3,7 @@
 
 #include "FlipperPlayerState.h"
 
-#include "FFlipperStepsContribution.h"
+#include "FlipperStepTypes.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -122,17 +122,11 @@ void AFlipperPlayerState::OverrideWith(APlayerState* PlayerState)
 {
 	Super::OverrideWith(PlayerState);
 	
-	// retrieve the saved inactive player state values if the player rejoins
-	// PostLogin checks for an inactive PlayerState (user left mid-gameplay), if one is found, this OverrideWith is called
-	const AFlipperPlayerState* FlipperPlayerState = Cast<AFlipperPlayerState>(PlayerState);
-	if (!FlipperPlayerState) return;
+	// no longer sets the variables from the playerstate that's passed in
+	// the engine swaps in the saved inactive player state
+	// PlayerState passed into this function is the empty (and not used due to restored one) one made at PostLogin
 	
-	SurfaceContribution = FlipperPlayerState->SurfaceContribution;
-	FundsEarned = FlipperPlayerState->FundsEarned;
-	FundsSpent = FlipperPlayerState->FundsSpent;
-	PickedUpCounts = FlipperPlayerState->PickedUpCounts;
-	
-	// ensure the set values are immediately reflected
+	// ensure the restored values are immediately reflected
 	OnRep_ContributionChanged();
 }
 
