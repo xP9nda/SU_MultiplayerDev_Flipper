@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "FlipperTablistRowWidget.generated.h"
 
+class UButton;
 class UBorder;
 class UTextBlock;
 class AFlipperPlayerState;
@@ -50,10 +51,16 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> SelfHighlightBorder;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> KickPlayerButton;
+	
 	TWeakObjectPtr<AFlipperPlayerState> ObservedPlayerState;
 	
 	UFUNCTION()
 	void OnContributionChanged();
+	
+	UFUNCTION()
+	void OnKickPlayerButtonPressed();
 	
 	void RefreshVisuals();
 };

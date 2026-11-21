@@ -11,13 +11,27 @@
 void UFlipperTablistWidget::ShowTablist()
 {
 	RebuildTablist();
-	SetVisibility(ESlateVisibility::HitTestInvisible);
+	SetVisibility(ESlateVisibility::Visible); // visible so entire tablist can receive input for button actions
+	
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (OwningPlayer)
+	{
+		OwningPlayer->SetShowMouseCursor(true);
+		OwningPlayer->SetInputMode(FInputModeGameAndUI());
+	}
 }
 
 void UFlipperTablistWidget::HideTablist()
 {
 	SetVisibility(ESlateVisibility::Collapsed);
 	PlayerRowsVerticalBox->ClearChildren();
+	
+	APlayerController* OwningPlayer = GetOwningPlayer();
+	if (OwningPlayer)
+	{
+		OwningPlayer->SetShowMouseCursor(false);
+		OwningPlayer->SetInputMode(FInputModeGameOnly());
+	}
 }
 
 void UFlipperTablistWidget::RebuildTablist()
