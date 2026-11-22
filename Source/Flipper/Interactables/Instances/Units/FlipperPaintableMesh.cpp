@@ -164,12 +164,10 @@ void AFlipperPaintableMesh::Interact_Implementation(AActor* Interactor)
 		{
 			if (CurrentFinish.MatchesTagExact(TargetFinish))
 			{
-				StepsPerPlayer.FindOrAdd(InteractorPlayerState).CorrectSteps++; // increment the CORRECT steps that this interactor has contributed to the wall
 				InteractorPlayerState->AddSurfaceContribution(EFlipperContributionType::Correct);
 			}
 			else
 			{
-				StepsPerPlayer.FindOrAdd(InteractorPlayerState).IncorrectSteps++; // increment the INCORRECT steps that this interactor has contributed to the wall 
 				InteractorPlayerState->AddSurfaceContribution(EFlipperContributionType::Incorrect);
 			}
 		}

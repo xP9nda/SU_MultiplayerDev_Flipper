@@ -67,9 +67,6 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_PaintState)
 	FGameplayTag CurrentFinish;
 	
-	// the number of steps completed per player to track contributions
-	TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepContribution> StepsPerPlayer;
-	
 	UFUNCTION()
 	void OnRep_PaintState();
 	
@@ -78,8 +75,7 @@ public:
 	FOnPaintableMeshCompleted OnPaintableMeshCompleted;
 	
 	bool IsCompleteAndCorrect() const;
-	const TMap<TWeakObjectPtr<AFlipperPlayerState>, FFlipperStepContribution>& GetStepsPerPlayer() const { return StepsPerPlayer; }
-	
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
 	virtual FFlipperInteractText GetInteractText(AActor* Interactor) override;
