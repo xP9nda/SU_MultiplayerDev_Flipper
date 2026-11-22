@@ -25,7 +25,7 @@ public class Flipper : ModuleRules
 			"OnlineSubsystemUtils"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "GoogleTest", "AITestSuite", "AITestSuite" });
+		PrivateDependencyModuleNames.AddRange(new string[] { });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"Flipper",
