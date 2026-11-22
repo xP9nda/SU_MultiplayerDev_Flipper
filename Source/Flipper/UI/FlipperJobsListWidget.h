@@ -29,10 +29,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
 	TSubclassOf<UFlipperJobProgressWidget> JobProgressWidgetClass; 
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Flipper|UI")
+	TSubclassOf<UUserWidget> JobsCompleteWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> JobsCompletionWidget;
+	
 	UFUNCTION()
 	void OnJobSiteRegistered(AFlipperJobSite* JobSite);
 	
 	UFUNCTION()
-	void OnJobSiteStateChanged(AFlipperJobSite* JobSite, EFlipperJobState JobState);
+	void OnJobSiteStateChanged(AFlipperJobSite* JobSite, const EFlipperJobState JobState);
 
 };
