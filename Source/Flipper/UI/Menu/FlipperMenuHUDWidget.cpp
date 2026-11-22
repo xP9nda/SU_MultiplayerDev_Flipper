@@ -67,18 +67,6 @@ void UFlipperMenuHUDWidget::NativeConstruct()
 	{
 		CloseGameButton->OnPressed.AddUniqueDynamic(this, &UFlipperMenuHUDWidget::OnCloseGameButtonPressed);
 	}
-	
-	if (SessionErrorTextBlock)
-	{
-		UFlipperSessionSubsystem* SessionSubsystem = GetGameInstance() ? GetGameInstance()->GetSubsystem<UFlipperSessionSubsystem>() : nullptr;
-		const FText ErrorMessage = SessionSubsystem ? SessionSubsystem->UseAndClearPendingError() : FText::GetEmpty();
-		
-		SessionErrorTextBlock->SetText(ErrorMessage);
-
-		const ESlateVisibility NewVisibility = ErrorMessage.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible;
-		SessionErrorTextBlock->SetVisibility(NewVisibility);
-		SessionErrorContainerWidget->SetVisibility(NewVisibility);
-	}
 }
 
 void UFlipperMenuHUDWidget::NativeDestruct()

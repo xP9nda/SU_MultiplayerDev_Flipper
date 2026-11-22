@@ -47,12 +47,6 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> NumberOfSessionsTextBlock;
 	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> SessionErrorTextBlock;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWidget> SessionErrorContainerWidget;
-	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> SearchResultWidgetClass;
 	

@@ -76,7 +76,7 @@ private:
 	void ReturnToMainMenu();
 	
 	bool bIsLeaving = false;
-	FText PendingErrorMessage;
+	FText PendingErrorMessage = FText::GetEmpty();
 	
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
